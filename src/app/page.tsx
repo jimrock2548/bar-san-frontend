@@ -2,7 +2,7 @@
 import React from 'react'
 import { motion, useAnimation } from 'framer-motion'
 import { useRouter } from 'next/navigation' // Import useRouter
-import { div } from 'framer-motion/client'
+
 
 function HoverCard({ image, alt, text, bgColor, textColor, borderColor, link }: {
   image: string,
@@ -14,10 +14,24 @@ function HoverCard({ image, alt, text, bgColor, textColor, borderColor, link }: 
   link: string // เพิ่ม prop สำหรับลิงก์
 }) {
   const controls = useAnimation()
-  const router = useRouter() // ใช้ useRouter
 
+  const router = useRouter() // ใช้ useRouter
   return (
-    <div className={`bg-${bgColor} flex items-center justify-center h-screen`}>
+    <div className={`flex items-center justify-center h-screen 
+      ${bgColor === 'black' ? '!bg-black' :
+        bgColor === 'white' ? '!bg-white' :
+        bgColor === 'neutral-900' ? '!bg-neutral-900' : ''
+      }
+      ${textColor === 'black' ? '!text-black' :
+        textColor === 'white' ? '!text-white' :
+        textColor === 'neutral-900' ? '!text-neutral-900' : ''
+      }
+        ${borderColor === 'black' ? '!border-black' :
+          borderColor === 'white' ? '!border-white' :
+          borderColor === 'neutral-900' ? '!border-neutral-900' : ''
+      }
+      `}>
+
       <motion.div
         className='relative w-[600px] h-[600px] overflow-hidden rounded-xl'
         onHoverStart={() => controls.start({ opacity: 1, y: 0 })}
@@ -48,32 +62,36 @@ function HoverCard({ image, alt, text, bgColor, textColor, borderColor, link }: 
 }
 
 function Page() {
+
+  const router = useRouter() // ใช้ useRouter
+
   return (
     <div className='relative'>
-    <button className='btn btn-outline text-black bg-white fixed top-4 right-4 z-10 w-30'>
-      Login
-    </button>
-    <div className='grid grid-cols-2'>
-      <HoverCard
-        image='/Barsan.png'
-        alt='Logo BARSAN'
-        text='Welcome to Barsan'
-        bgColor='white'
-        textColor='black'
-        borderColor='black'
-        link='/barsan'
-      />
-      <HoverCard
-        image='/Noir.png'
-        alt='Logo NOIR'
-        text='Discover NOIR'
-        bgColor='black'
-        textColor='white'
-        borderColor='white'
-        link='/noir'
-      />
+      <button className='btn btn-outline text-black bg-white fixed top-4 right-4 z-10 w-30'
+        onClick={() => router.push('users/login')}>
+        Login
+      </button>
+      <div className='grid grid-cols-2'>
+        <HoverCard
+          image='/Barsan.png'
+          alt='Logo BARSAN'
+          text='Welcome to Barsan'
+          bgColor='white'
+          textColor='black'
+          borderColor='black'
+          link='/barsan'
+        />
+        <HoverCard
+          image='/Noir.png'
+          alt='Logo NOIR'
+          text='Discover NOIR'
+          bgColor='black'
+          textColor='white'
+          borderColor='white'
+          link='/noir'
+        />
+      </div>
     </div>
-  </div>
   )
 }
 
