@@ -54,7 +54,7 @@ function HoverCard({ image, alt, text, bgColor, textColor, borderColor, link }: 
           transition={{ duration: 0.4 }}
           className={`absolute bottom-15 left-1/2 transform -translate-x-1/2 w-fit btn btn-outline text-${textColor} bg-${bgColor} border-${borderColor} pointer-events-none `}
         >
-          จองโต๊ะ
+          Reservation
         </motion.div>
       </motion.div>
     </div>
