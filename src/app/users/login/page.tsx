@@ -1,49 +1,174 @@
 'use client'
-import React from 'react'
+import React, { useState } from 'react'
+import { useRouter } from 'next/navigation'
 
 export default function Page() {
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const router = useRouter()
+
+  const handleGoogleLogin = () => {
+    setIsGoogleLoading(true)
+
+    setTimeout(() => {
+      localStorage.setItem(
+        "users",
+        JSON.stringify({
+          id: "1",
+          name: "TestNameGoogle",
+          email: "example@google.test",
+          phone: "123456789",
+          isLoggedIn: true,
+        })
+      )
+      setIsGoogleLoading(false)
+      router.push("../")
+    }, 2000)
+  }
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsLoading(true)
+
+    setTimeout(() => {
+      localStorage.setItem(
+        "users",
+        JSON.stringify({
+          id: "2",
+          name: "TestNameEmail",
+          email: "example@email.test",
+          phone: "987654321",
+          isLoggedIn: true,
+        })
+      )
+      setIsLoading(false)
+      router.push("../")
+    }, 2000)
+  }
+
+  const handleGuestContinue = () => {
+    localStorage.setItem(
+      "users",
+      JSON.stringify({
+        id: "3",
+        name: "Guest",
+        email: "",
+        phone: "",
+        isLoggedIn: false,
+      })
+    )
+    router.push("../")
+  }
+
   return (
-    <div className="min-h-screen grid grid-row items-center justify-center bg-base-200">
-      <div className="card w-full max-w-sm shadow-xl bg-base-100 border border-gray-700">
-        <div className="card-body">
-        <h2 className="text-3xl font-semibold text-center mb-6 tracking-wide">
-            เข้าสู่ระบบ
-          </h2>
-                <form>
-            <div className="form-control mb-4">
-              <label className="label">
-                <span className="label-text">อีเมล</span>
-              </label>
-              <input
-                type="email"
-                placeholder="you@example.com"
-                className="input input-bordered bg-black text-white placeholder-gray-400"
-                required
-              />
+    <main className="flex-1 py-16 container mx-auto px-4">
+      <div className="max-w-md mx-auto">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl  font-bold mb-2 text-[#1a1814]">Login</h1>
+          <p className="text-[#8a7356]">Log in to book a table faster.</p>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-md p-6 mb-3">
+          <button
+            type="button"
+            disabled={isGoogleLoading}
+            onClick={handleGoogleLogin}
+            className="w-full h-11 flex items-center justify-center gap-2 mb-3 border-b-gray-400 hover:bg-gray-50"
+          >
+            {isGoogleLoading ? (
+              <div className="h-4 w-4 border-2 border-gray-600 border-t-transparent rounded-full animate-spin"></div>
+            ) : (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 186.69 190.5"
+                className="h-4 w-4"
+              >
+                <g transform="translate(1184.583 765.171)">
+                  <path
+                    d="M-1089.333-687.239v36.888h51.262c-2.251 11.863-9.006 21.908-19.137 28.662l30.913 23.986c18.011-16.625 28.402-41.044 28.402-70.052 0-6.754-.606-13.249-1.732-19.483z"
+                    fill="#4285f4"
+                  />
+                  <path
+                    d="M-1142.714-651.791l-6.972 5.337-24.679 19.223h0c15.673 31.086 47.796 52.561 85.03 52.561 25.717 0 47.278-8.486 63.038-23.033l-30.913-23.986c-8.486 5.715-19.31 9.179-32.125 9.179-24.765 0-45.806-16.712-53.34-39.226z"
+                    fill="#34a853"
+                  />
+                  <path
+                    d="M-1174.365-712.61c-6.494 12.815-10.217 27.276-10.217 42.689s3.723 29.874 10.217 42.689c0 .086 31.693-24.592 31.693-24.592-1.905-5.715-3.031-11.776-3.031-18.098s1.126-12.383 3.031-18.098z"
+                    fill="#fbbc05"
+                  />
+                  <path
+                    d="M-1089.333-727.244c14.028 0 26.497 4.849 36.455 14.201l27.276-27.276c-16.539-15.413-38.013-24.852-63.731-24.852-37.234 0-69.359 21.388-85.032 52.561l31.692 24.592c7.533-22.514 28.575-39.226 53.34-39.226z"
+                    fill="#ea4335"
+                  />
+                </g>
+              </svg>
+            )}
+            <span>{isGoogleLoading ? "กำลังเข้าสู่ระบบ..." : "เข้าสู่ระบบด้วย Google"}</span>
+          </button>
+
+          <div className="flex items-center mb-3">
+            <hr className="flex-grow border-t border-gray-300" />
+            <span className="mx-3 text-xs text-gray-500 whitespace-nowrap">
+              Or sign in with email
+            </span>
+            <hr className="flex-grow border-t border-gray-300" />
+          </div>
+
+          {/* name of each tab group should be unique */}
+          <div className="tabs tabs-box">
+            <input type="radio" name="my_tabs_1" className="tab w-1/2" aria-label="Login" defaultChecked />
+            <div className="tab-content">
+              <fieldset className="fieldset">
+                <legend className="fieldset-legend" >Email</legend>
+                <input type="email" className="input w-full" placeholder="Type your email here" />
+              </fieldset>
+              <fieldset className="fieldset">
+                <legend className="fieldset-legend ">Password</legend>
+                <input type="password" className="input w-full" placeholder="Type your password here" />
+              </fieldset>
+              <div className='my-6' />
+              <button className='btn btn-neutral w-full '>Login</button>
             </div>
-
-            <div className="form-control mb-6">
-              <label className="label">
-                <span className="label-text">รหัสผ่าน</span>
-              </label>
-              <input
-                type="password"
-                placeholder="********"
-                className="input input-bordered bg-black text-white placeholder-gray-400"
-                required
-              />
+            <input type="radio" name="my_tabs_1" className="tab w-1/2" aria-label="Register" />
+            <div className="tab-content">
+            <fieldset className="fieldset">
+                <legend className="fieldset-legend">Name</legend>
+                <input type="text" className="input w-full" placeholder="Type your name here" />
+              </fieldset>
+              <fieldset className="fieldset">
+                <legend className="fieldset-legend">Phone number</legend>
+                <input type="text" className="input w-full" placeholder="Type your phone number here" />
+              </fieldset>
+              <fieldset className="fieldset">
+                <legend className="fieldset-legend">Email</legend>
+                <input type="text" className="input w-full" placeholder="Type your email here" />
+              </fieldset>
+              <fieldset className="fieldset">
+                <legend className="fieldset-legend ">Password</legend>
+                <input type="text" className="input w-full" placeholder="password" />
+              </fieldset>
+              <fieldset className="fieldset">
+                <legend className="fieldset-legend ">Confirm password</legend>
+                <input type="text" className="input w-full" placeholder="Confirm password" />
+              </fieldset>
+              <div className='my-6' />
+              <button className='btn btn-neutral w-full '>Register</button>
             </div>
-
-            <button className="btn btn-outline btn-primary w-full tracking-wide">
-              เข้าสู่ระบบ
-            </button>
-          </form>
-
-          <div className="text-center mt-4 text-sm opacity-60">
-            ยังไม่มีบัญชี? <a href="/register" className="link link-hover link-primary">สมัครสมาชิก</a>
           </div>
         </div>
+
+        <div className="text-center">
+          <p className="mb-4 text-[#8a7356]">หรือ</p>
+          <button
+            className="w-full btn btn-outline"
+            onClick={handleGuestContinue}
+          >
+            ดำเนินการต่อในฐานะผู้ใช้ทั่วไป
+          </button>
+        </div>
       </div>
-    </div>
+    </main>
   )
 }

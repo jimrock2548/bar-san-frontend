@@ -10,8 +10,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             ← Back
           </a>
         </div>
-      </div> 
-      {children}
+      </div>
+        {children}
+
     </div>
   )
 }
