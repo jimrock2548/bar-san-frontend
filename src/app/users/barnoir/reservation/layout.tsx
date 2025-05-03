@@ -4,7 +4,7 @@ import React from 'react'
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <div>
-      <div className="navbar bg-black text-white border-b border-stone-500 h-20 px-4">
+      <div className="navbar bg-black text-white border-b border-zinc-700 h-20 px-4">
         <div className="flex-1">
           <a href="../../" className="btn btn-ghost text-lg">
             ← Back

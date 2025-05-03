@@ -12,6 +12,7 @@
     "framer-motion": "^12.9.4",
     "next": "15.3.0",
     "react": "^19.0.0",
+    "react-day-picker": "^9.6.7",
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
