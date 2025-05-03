@@ -5,6 +5,15 @@ import { useRouter } from 'next/navigation'
 export default function Page() {
   const [isGoogleLoading, setIsGoogleLoading] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [email,setEmail] = useState("")
+  const [password, setPassword] = useState("")
+
+  const [name,setName] = useState("")
+  const [phone,setPhone] = useState("")
+  const [regisEmail,setRegisEmail] = useState("")
+  const [regisPassword,setRegisPassword] = useState("")
+  const [regisConfirmPassword,setRegisConfirmPassword] = useState("")
+
   const router = useRouter()
 
   const handleGoogleLogin = () => {
@@ -29,7 +38,7 @@ export default function Page() {
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
-
+    console.log("Logging in with", email, password)
     setTimeout(() => {
       localStorage.setItem(
         "users",
@@ -44,6 +53,20 @@ export default function Page() {
       setIsLoading(false)
       router.push("../")
     }, 2000)
+  }
+
+  const handleRegister = (e: React.FormEvent) => {
+    e.preventDefault()
+    localStorage.setItem(
+     " users",JSON.stringify({
+        id:"3",
+        name,
+        email,
+        phone,
+        isLoggedin: true,
+      })
+    )
+    router.push("../")
   }
 
   const handleGuestContinue = () => {
@@ -119,42 +142,94 @@ export default function Page() {
           {/* name of each tab group should be unique */}
           <div className="tabs tabs-box">
             <input type="radio" name="my_tabs_1" className="tab w-1/2" aria-label="Login" defaultChecked />
-            <div className="tab-content">
+            <div className="tab-content" >
+              <form onSubmit={handleLogin}>
               <fieldset className="fieldset">
                 <legend className="fieldset-legend" >Email</legend>
-                <input type="email" className="input w-full" placeholder="Type your email here" />
+                <input 
+                type="email" 
+                className="input w-full" 
+                placeholder="example@example.com" 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                />
               </fieldset>
               <fieldset className="fieldset">
                 <legend className="fieldset-legend ">Password</legend>
-                <input type="password" className="input w-full" placeholder="Type your password here" />
+                <input type="password" 
+                className="input w-full" 
+                placeholder="Type your password here" 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                />
               </fieldset>
               <div className='my-6' />
-              <button className='btn btn-neutral w-full '>Login</button>
+              <button className='btn btn-neutral w-full' type='submit'>Login</button>
+              </form>
             </div>
             <input type="radio" name="my_tabs_1" className="tab w-1/2" aria-label="Register" />
             <div className="tab-content">
+            <form onSubmit={handleRegister}>
             <fieldset className="fieldset">
                 <legend className="fieldset-legend">Name</legend>
-                <input type="text" className="input w-full" placeholder="Type your name here" />
+                <input 
+                type="text"
+                className="input w-full"
+                placeholder="Type your name here" 
+                value={name}
+                onChange={(e)=> setName(e.target.value)}
+                required
+                />
               </fieldset>
               <fieldset className="fieldset">
                 <legend className="fieldset-legend">Phone number</legend>
-                <input type="text" className="input w-full" placeholder="Type your phone number here" />
+                <input 
+                type="text" 
+                className="input w-full" 
+                placeholder="Type your phone number here" 
+                value={phone}
+                onChange={(e)=> setPhone(e.target.value)}
+                required
+                />
               </fieldset>
               <fieldset className="fieldset">
                 <legend className="fieldset-legend">Email</legend>
-                <input type="text" className="input w-full" placeholder="Type your email here" />
+                <input 
+                type="email" 
+                className="input w-full"
+                placeholder="Type your email here" 
+                value={regisEmail}
+                onChange={(e)=> setRegisEmail(e.target.value)}
+                required
+                />
               </fieldset>
               <fieldset className="fieldset">
                 <legend className="fieldset-legend ">Password</legend>
-                <input type="text" className="input w-full" placeholder="password" />
+                <input 
+                type="password" 
+                className="input w-full" 
+                placeholder="password"
+                value={regisPassword}
+                onChange={(e)=> setRegisPassword(e.target.value)}
+                required
+                />
               </fieldset>
               <fieldset className="fieldset">
                 <legend className="fieldset-legend ">Confirm password</legend>
-                <input type="text" className="input w-full" placeholder="Confirm password" />
+                <input 
+                type="password" 
+                className="input w-full" 
+                placeholder="Confirm password"
+                value={regisConfirmPassword}
+                onChange={(e)=> setRegisConfirmPassword(e.target.value)}
+                required
+                />
               </fieldset>
               <div className='my-6' />
-              <button className='btn btn-neutral w-full '>Register</button>
+              <button className='btn btn-neutral w-full' type='submit'>Register</button>
+            </form>
             </div>
           </div>
         </div>

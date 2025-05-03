@@ -88,7 +88,7 @@ function Page() {
           bgColor='black'
           textColor='white'
           borderColor='white'
-          link='/noir'
+          link='/users/barnoir/reservation'
         />
       </div>
     </div>
