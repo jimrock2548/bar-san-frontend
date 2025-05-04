@@ -1,10 +1,39 @@
 'use client'
-import { defaultValueTypes } from 'framer-motion';
 import React, { useState } from 'react'
 import { DayPicker } from "react-day-picker";
 
+type Option = {
+  id: string;
+  title: string;
+  description: string;
+};
+
 function Page() {
   const [date, setDate] = useState<Date>();
+  const [selectedOption, setSelectedOption] = useState<string>('');
+
+  const options: Option[] = [
+    {
+      id: 'counter',
+      title: 'Bar Counter',
+      description: 'Suitable for 1–2 guests, seated at the bar counter',
+    },
+    {
+      id: 'couple',
+      title: 'Couple Table',
+      description: 'Ideal for 2 guests, providing a comfortable setting',
+    },
+    {
+      id: 'large',
+      title: 'Large Group Table  ( tables can be separated )',
+      description: 'Suitable for 4–8 guests, seated in the central area  of the venue',
+    }
+  ]
+
+  const handleOptionChange = (id: string) => {
+    setSelectedOption(id);
+  };
+
   return (
     <main className="min-h-screen bg-black px-4 text-white">
       <div className="flex flex-col justify-center items-center text-center py-16 space-y-4">
@@ -39,14 +68,15 @@ function Page() {
 
 
 
-          <div className='grid grid-cols-2 gap-3'>
-            {/* Form inputs */}
+          <div className='grid grid-cols-2 gap-5'>
+            {/* left side */}
             <div className='flex flex-col font-abhaya mt-8 space-y-6'>
+              {/* Form inputs */}
               <div className='w-full'>
                 <h1 className='text-white flex justify-start mb-2'>Full Name</h1>
                 <input
                   type="text"
-                  className="input w-full bg-gray-900 border border-zinc-700 rounded-none p-3"
+                  className="input w-full bg-gray-900 border border-zinc-700 rounded p-3"
                   placeholder="Jane doe"
                   value="Jane doe"
                   readOnly
@@ -57,7 +87,7 @@ function Page() {
                 <h1 className='text-white flex justify-start mb-2'>Phone number</h1>
                 <input
                   type="tel"
-                  className="input w-full bg-gray-900 border border-zinc-700 rounded-none p-3"
+                  className="input w-full bg-gray-900 border border-zinc-700 rounded p-3"
                   placeholder="123-456-789"
                   value="123-456-789"
                   readOnly
@@ -68,7 +98,7 @@ function Page() {
                 <h1 className='text-white flex justify-start mb-2'>Email</h1>
                 <input
                   type="email"
-                  className="input w-full bg-gray-900 border border-zinc-700 rounded-none p-3"
+                  className="input w-full bg-gray-900 border border-zinc-700 rounded p-3"
                   placeholder="example@email.com"
                   value="example@email.com"
                   readOnly
@@ -79,7 +109,7 @@ function Page() {
                 <h1 className='text-white flex justify-start mb-2'>Number of guests</h1>
                 <select
                   value={1}
-                  className="select select-lg w-full bg-gray-900 border border-zinc-700 rounded-none p-3 textarea-md">
+                  className="select select-lg w-full bg-gray-900 border border-zinc-700 rounded p-3 textarea-md">
                   <option disabled selected >Choose number of guests</option>
                   <option>1</option>
                   <option>2</option>
@@ -113,13 +143,64 @@ function Page() {
                     <option>5+</option>
                   </select>
                 </div>
-
               </div>
-
-            
-
             </div>
-
+            {/* right side */}
+            <div className='flex flex-col font-abhaya mt-8 items-start w-full space-y-3'>
+              {/* bar map */}
+              <h1 className='text-2xl'>Choose zone</h1>
+              <div className='w-full border border-zinc-700  rounded-2xl p-6 '>
+                <div className='flex flex-col items-start w-full space-y-2'>
+                  <h1 className='text-lg mb-4'>Map</h1>
+                  <div className='w-full overflow-auto flex justify-center  bg-gray-900 '>
+                    <img
+                      src="/mapNoir.png"
+                      alt="map"
+                      className="max-w-full h-auto object-contain "
+                    />
+                  </div>
+                  <div className="flex gap-4 text-sm text-gray-400 mt-2">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 bg-gray-900 border-2 border-gray-700 rounded-full"></div>
+                      <span>Available</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 bg-red-900 bg-opacity-20 border-2 border-red-900 rounded-full"></div>
+                      <span>Unavailable</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {/* choose zone */}
+              {options.map((option) => (
+                <div
+                  key={option.id}
+                  className={`w-full border rounded-2xl p-6 flex items-start hover:bg-gray-900 cursor-pointer ${selectedOption === option.id ? 'border-green-900 bg-green-950' : 'border-zinc-700'
+                    }`}
+                  onClick={() => handleOptionChange(option.id)}
+                >
+                  <input
+                    type="radio"
+                    id={option.id}
+                    name="seatingOptions"
+                    checked={selectedOption === option.id}
+                    onChange={() => handleOptionChange(option.id)}
+                    className="mt-1 mr-4 h-5 w-5 text-blue-600 flex-none cursor-pointer"
+                  />
+                  <div className="flex flex-col items-start">
+                    <label htmlFor={option.id} className="text-lg cursor-pointer">
+                      {option.title}
+                    </label>
+                    <p className="text-gray-500">{option.description}</p>
+                  </div>
+                </div>
+              ))}
+              {/* Note */}
+              <div className=" flex flex-col items-start space-y-3 w-full">
+                <div className=" text-white ">Note</div>
+                <textarea className="textarea h-24 bg-gray-900" placeholder="Bio"></textarea>
+              </div>
+            </div>
           </div>
         </div>
       </div>
