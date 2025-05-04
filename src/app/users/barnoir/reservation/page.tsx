@@ -213,7 +213,9 @@ function Page() {
               <div className='text-xl'>Table -</div>
             </div>
           </div>
-          <button className='btn bg-white my-6 text-lg'>Confirm Reservation</button>
+          <a href='./confirmation' 
+          className='btn bg-white my-6 text-lg'
+          >Confirm Reservation</a>
           <div className='text-xl text-gray-400 flex items-center font-abhaya'>Please arrive at the restaurant before 08.00 PM .  If you wish to cancel, kindly contact us at least 40 minutes in advance.</div>
         </div>
       </div>
