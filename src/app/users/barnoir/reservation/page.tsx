@@ -198,10 +198,23 @@ function Page() {
               {/* Note */}
               <div className=" flex flex-col items-start space-y-3 w-full">
                 <div className=" text-white ">Note</div>
-                <textarea className="textarea h-24 bg-gray-900" placeholder="Bio"></textarea>
+                <textarea className="textarea h-24 bg-gray-900 w-full" placeholder="Bio"></textarea>
               </div>
             </div>
           </div>
+          <hr className="border-t border-zinc-700 my-10" />
+          <div className="flex flex-col  font-abhaya w-10/12 space-y-4 ">
+            <div className='flex justify-between'>
+              <div className='text-2xl'>Reservation Summary</div>
+              <div className='text-xl'>Date -</div>
+            </div>
+            <div className='flex justify-between'>
+              <div className='text-lg text-gray-400'>Please review the information before confirming your booking</div>
+              <div className='text-xl'>Table -</div>
+            </div>
+          </div>
+          <button className='btn bg-white my-6 text-lg'>Confirm Reservation</button>
+          <div className='text-xl text-gray-400 flex items-center font-abhaya'>Please arrive at the restaurant before 08.00 PM .  If you wish to cancel, kindly contact us at least 40 minutes in advance.</div>
         </div>
       </div>
     </main>
