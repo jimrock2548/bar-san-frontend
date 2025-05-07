@@ -68,7 +68,7 @@ function Page() {
   return (
     <div className='relative'>
       <button className='btn btn-outline text-black bg-white fixed top-4 right-4 z-10 w-30'
-        onClick={() => router.push('users/login')}>
+        onClick={() => router.push('/login')}>
         Login
       </button>
       <div className='grid grid-cols-2'>
