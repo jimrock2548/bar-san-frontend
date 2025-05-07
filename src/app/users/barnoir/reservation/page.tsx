@@ -1,6 +1,7 @@
 'use client'
 import React, { useState } from 'react'
 import { DayPicker } from "react-day-picker";
+import {UserRound} from "lucide-react"
 
 type Option = {
   id: string;
@@ -47,20 +48,7 @@ function Page() {
           <div className="card card-sm card-border border-zinc-700 bg-base-100 w-full text-white bg-gray-900">
             <div className="card-body font-abhaya ">
               <h2 className="card-title font-extralight">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="w-6 h-6"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.5 20.25a8.25 8.25 0 0115 0"
-                  />
-                </svg>
+              <UserRound></UserRound>
                 Welcome, Google User.</h2>
               <h2 className="card-title font-extralight">You are booking a table as a member. Your personal information will be used for this reservation.</h2>
             </div>

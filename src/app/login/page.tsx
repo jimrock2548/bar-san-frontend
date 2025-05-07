@@ -45,7 +45,7 @@ export default function Page() {
         JSON.stringify({
           id: "2",
           name: "TestNameEmail",
-          email: "example@email.test",
+          email: "email",
           phone: "987654321",
           isLoggedIn: true,
         })
@@ -74,7 +74,7 @@ export default function Page() {
       "users",
       JSON.stringify({
         id: "3",
-        name: "Guest",
+        name: "",
         email: "",
         phone: "",
         isLoggedIn: false,
