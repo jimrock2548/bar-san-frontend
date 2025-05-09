@@ -1,6 +1,6 @@
 import React from 'react'
 import { Check, Calendar, Clock, UserRound, MapPin } from 'lucide-react'
-import Status from '@/app/component/status'
+import Status from '@/app/components/status'
 
 function Page() {
   return (
