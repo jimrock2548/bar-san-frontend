@@ -179,12 +179,13 @@ export default function Page() {
               <div>{booking.zone}</div>
               <div>
                 <select
-                  className="select select-bordered select-sm w-25"
+                  className="select select-bordered select-sm w-35 "
                   value={selectedTable[booking.id] || ""}
                   onChange={(e) => handleSelectTable(booking.id, e.target.value)}
                 >
                   <option value="">เลือกโต๊ะ</option>
-                  {tables.map((table) => (
+                  {tables.filter(table => table.zone === booking.zone)
+                  .map((table) => (
                     <option
                       key={table.id}
                       value={`${table.zone} - โต๊ะ ${table.number}`}
