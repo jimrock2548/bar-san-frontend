@@ -1,6 +1,7 @@
 "use client"
 
 import type { ReactNode } from "react"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import {
@@ -37,10 +38,10 @@ export default function AdminLayout({ children, user, selectedCafe, onCafeChange
   const navigation = [
     { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
     { name: "Reseravtion ", href: "/admin/reservation", icon: CalendarRange },
-    { name: "Tables", href: "/admin/tables", icon: Table2 },
-    { name: "Member", href: "/admin/tables", icon: UserRoundSearch },
-    { name: "Role", href: "/admin/tables", icon: UserCog },
-    { name: "Log", href: "/admin/tables", icon: Logs },
+    { name: "Tables", href: "/admin/table", icon: Table2 },
+    { name: "Member", href: "/admin/member", icon: UserRoundSearch },
+    { name: "Role", href: "/admin/role", icon: UserCog },
+    { name: "Log", href: "/admin/log", icon: Logs },
   ]
 
   /*if (user?.role === "superadmin") {
