@@ -36,7 +36,7 @@ export default function AdminLayout({ children, user, selectedCafe, onCafeChange
   }
   const navigation = [
     { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
-    { name: "Reseravtion ", href: "/admin/reservations", icon: CalendarRange },
+    { name: "Reseravtion ", href: "/admin/reservation", icon: CalendarRange },
     { name: "Tables", href: "/admin/tables", icon: Table2 },
     { name: "Member", href: "/admin/tables", icon: UserRoundSearch },
     { name: "Role", href: "/admin/tables", icon: UserCog },
