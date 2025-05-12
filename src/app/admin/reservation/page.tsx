@@ -109,7 +109,7 @@
               />
               <div className="flex justify-end mt-2">
                 <button className="btn btn-xs" onClick={() => setSelectedDate(undefined)}>
-                  ล้างวันที่
+                  Clear date
                 </button>
               </div>
             </div>
@@ -122,25 +122,25 @@
             className={`tab ${filter === "all" ? "tab-active" : ""}`}
             onClick={() => setFilter("all")}
           >
-            ทั้งหมด
+            All
           </button>
           <button
             className={`tab ${filter === "confirmed" ? "tab-active" : ""}`}
             onClick={() => setFilter("confirmed")}
           >
-            ยืนยันแล้ว
+            Confirm
           </button>
           <button
             className={`tab ${filter === "pending" ? "tab-active" : ""}`}
             onClick={() => setFilter("pending")}
           >
-            รอดำเนินการ
+            Up-coming
           </button>
           <button
             className={`tab ${filter === "cancelled" ? "tab-active" : ""}`}
             onClick={() => setFilter("cancelled")}
           >
-            ยกเลิก
+            Cancelled
           </button>
         </div>
 
@@ -149,13 +149,13 @@
           <table className="table table-zebra w-full">
             <thead>
               <tr>
-                <th>ชื่อ</th>
-                <th>วันที่</th>
-                <th>เวลา</th>
-                <th>โซน</th>
-                <th>สถานะ</th>
-                <th>โต๊ะ</th>
-                <th>ลบ</th>
+                <th>Name</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Zone</th>
+                <th>Status</th>
+                <th>Table</th>
+                <th>Delete</th>
               </tr>
             </thead>
             <tbody>
@@ -201,7 +201,7 @@
               {filteredReservations.length === 0 && (
                 <tr>
                   <td colSpan={6} className="text-center text-gray-500">
-                    ไม่มีข้อมูลในหมวดนี้
+                    No data
                   </td>
                 </tr>
               )}
