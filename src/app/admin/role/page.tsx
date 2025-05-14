@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { ChevronDown, ChevronUp, Grip, Plus, Save, Trash2 } from "lucide-react"
 import { cn } from "@/app/lib/utils"
+import { view } from "framer-motion/client"
 
 // Sample data for roles
 const initialRoles = [
@@ -12,229 +13,118 @@ const initialRoles = [
     color: "#FF5733",
     position: 1,
     permissions: {
-      system: {
-        manageSystem: true,
-        viewAnalytics: true,
+      dashboard: {
+        viewDashboard: true,
+        assignTable: true,
         manageSettings: true,
       },
-      users: {
-        manageUsers: true,
-        viewUsers: true,
-        assignRoles: true,
+      reservation: {
+        viewReservation: true,
+        updateStatus: true,
+        reservationDelete: true,
       },
-      roles: {
-        manageRoles: true,
-        viewRoles: true,
+      table: {
+        viewTable: true,
+        addTable: true,
+        editTable: true,
       },
-      cafes: {
-        manageCafes: true,
-        viewCafes: true,
-        editCafes: true,
+      member: {
+        viewMember: true,
+        editMember: true,
+        addRoleToMember: true,
+        addNewAdminAccount: true,
       },
-      reservations: {
-        manageReservations: true,
-        viewReservations: true,
-        editReservations: true,
-        deleteReservations: true,
+      role: {
+        roleManage: true,
       },
-      tables: {
-        manageTables: true,
-        viewTables: true,
-        editTables: true,
-      },
-      reports: {
-        viewReports: true,
-        exportReports: true,
+      log: {
+        viewReport: true,
       },
     },
-    memberCount: 2,
+    memberCount: 3,
   },
   {
     id: 2,
-    name: "Admin",
-    color: "#3366FF",
+    name: "Staff",
+    color: "#CC5733",
     position: 2,
     permissions: {
-      system: {
-        manageSystem: false,
-        viewAnalytics: true,
-        manageSettings: false,
+      dashboard: {
+        viewDashboard: true,
+        assignTable: true,
+        manageSettings: true,
       },
-      users: {
-        manageUsers: true,
-        viewUsers: true,
-        assignRoles: false,
+      reservation: {
+        viewReservation: true,
+        updateStatus: true,
+        reservationDelete: true,
       },
-      roles: {
-        manageRoles: false,
-        viewRoles: true,
+      table: {
+        viewTable: true,
+        addTable: true,
+        editTable: true,
       },
-      cafes: {
-        manageCafes: false,
-        viewCafes: true,
-        editCafes: true,
+      member: {
+        viewMember: true,
+        editMember: true,
+        addRoleToMember: true,
+        addNewAdminAccount: true,
       },
-      reservations: {
-        manageReservations: true,
-        viewReservations: true,
-        editReservations: true,
-        deleteReservations: true,
+      role: {
+        roleManage: true,
       },
-      tables: {
-        manageTables: true,
-        viewTables: true,
-        editTables: true,
-      },
-      reports: {
-        viewReports: true,
-        exportReports: false,
+      log: {
+        viewReport: true,
       },
     },
-    memberCount: 5,
-  },
-  {
-    id: 3,
-    name: "Cafe Manager",
-    color: "#33CC66",
-    position: 3,
-    permissions: {
-      system: {
-        manageSystem: false,
-        viewAnalytics: false,
-        manageSettings: false,
-      },
-      users: {
-        manageUsers: false,
-        viewUsers: true,
-        assignRoles: false,
-      },
-      roles: {
-        manageRoles: false,
-        viewRoles: false,
-      },
-      cafes: {
-        manageCafes: false,
-        viewCafes: true,
-        editCafes: false,
-      },
-      reservations: {
-        manageReservations: true,
-        viewReservations: true,
-        editReservations: true,
-        deleteReservations: false,
-      },
-      tables: {
-        manageTables: true,
-        viewTables: true,
-        editTables: true,
-      },
-      reports: {
-        viewReports: true,
-        exportReports: false,
-      },
-    },
-    memberCount: 8,
-  },
-  {
-    id: 4,
-    name: "Staff",
-    color: "#FFCC33",
-    position: 4,
-    permissions: {
-      system: {
-        manageSystem: false,
-        viewAnalytics: false,
-        manageSettings: false,
-      },
-      users: {
-        manageUsers: false,
-        viewUsers: false,
-        assignRoles: false,
-      },
-      roles: {
-        manageRoles: false,
-        viewRoles: false,
-      },
-      cafes: {
-        manageCafes: false,
-        viewCafes: true,
-        editCafes: false,
-      },
-      reservations: {
-        manageReservations: false,
-        viewReservations: true,
-        editReservations: true,
-        deleteReservations: false,
-      },
-      tables: {
-        manageTables: false,
-        viewTables: true,
-        editTables: false,
-      },
-      reports: {
-        viewReports: false,
-        exportReports: false,
-      },
-    },
-    memberCount: 15,
+    memberCount: 3,
   },
 ]
 
 // กลุ่มของ permission ที่มีในระบบ
 const permissionGroups = {
-  system: {
-    label: "ระบบ",
+  dashboard: {
+    label: "Dashboard",
     permissions: {
-      manageSystem: "จัดการระบบทั้งหมด",
-      viewAnalytics: "ดูข้อมูลวิเคราะห์",
-      manageSettings: "จัดการการตั้งค่าระบบ",
+      viewDashboard: "ดูข้อมูลหน้า Dashboard",
+      assignTable: "กำหนดโต๊ะให้ลูกค้า",
     },
   },
-  users: {
-    label: "ผู้ใช้งาน",
+  reservation: {
+    label: "Manage Reservation",
     permissions: {
-      manageUsers: "จัดการผู้ใช้งาน",
-      viewUsers: "ดูรายชื่อผู้ใช้งาน",
-      assignRoles: "กำหนด Role ให้ผู้ใช้งาน",
+      viewReservation: "ดูข้อมูลการจอง",
+      updateStatus: "อัพเดทสถานะให้ลูกค้า",
+      reservationDelete: "ลบข้อมูลการจอง",
     },
   },
-  roles: {
-    label: "บทบาท",
+  table: {
+    label: "Manage Table",
     permissions: {
-      manageRoles: "จัดการบทบาท",
-      viewRoles: "ดูรายการบทบาท",
+      viewTable: "ดูข้อมูลโต๊ะ",
+      addTable: "เพิ่มโต๊ะ",
+      editTable: "จัดการโต๊ะ",
     },
   },
-  cafes: {
-    label: "ร้านกาแฟ",
+  member: {
+    label: "Manage Member",
     permissions: {
-      manageCafes: "จัดการร้านกาแฟ",
-      viewCafes: "ดูข้อมูลร้านกาแฟ",
-      editCafes: "แก้ไขข้อมูลร้านกาแฟ",
+      viewMember: "ดูข้อมูล Admin ในร้าน",
+      editMember: "จัดการข้อมูล Admin",
+      addRoleToMember: "สามารถใส่บทบาทให้คนอื่นได้",
+      addNewAdminAccount: "สร้าง ID Admin ใหม่ได้",
     },
   },
-  reservations: {
-    label: "การจอง",
+  role: {
+    label: "Role Management",
     permissions: {
-      manageReservations: "จัดการการจองทั้งหมด",
-      viewReservations: "ดูรายการจอง",
-      editReservations: "แก้ไขการจอง",
-      deleteReservations: "ลบการจอง",
+      roleManage: "จัดการบทบาททั้งหมดได้",
     },
   },
-  tables: {
-    label: "โต๊ะ",
+  log: {
+    label: "Log",
     permissions: {
-      manageTables: "จัดการโต๊ะทั้งหมด",
-      viewTables: "ดูข้อมูลโต๊ะ",
-      editTables: "แก้ไขข้อมูลโต๊ะ",
-    },
-  },
-  reports: {
-    label: "รายงาน",
-    permissions: {
-      viewReports: "ดูรายงาน",
-      exportReports: "ส่งออกรายงาน",
+      viewReport: "ดูรายงานทั้งหมด",
     },
   },
 }
@@ -341,260 +231,231 @@ export default function RolesPage() {
     setRoles(roles.map((role) => (role.id === roleId ? { ...role, color: newColor } : role)))
   }
   return (
+    <div className="p-6">
+    <div className="flex justify-between items-center mb-6">
+      <div>
+        <h1 className="text-3xl font-bold">จัดการบทบาท (Roles)</h1>
+        <p className="text-gray-500 mt-1">
+          สร้างและกำหนดสิทธิ์การเข้าถึงสำหรับบทบาทต่างๆ ในระบบ
+        </p>
+      </div>
+      <button
+        className="btn btn-primary"
+        onClick={() => {
+          setIsCreatingRole(true)
+          setSelectedRoleId(null)
+        }}
+      >
+        <Plus size={16} />
+        สร้างบทบาทใหม่
+      </button>
+    </div>
 
-           <div className="p-6">
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h1 className="text-3xl font-bold">จัดการบทบาท (Roles)</h1>
-            <p className="text-gray-500 mt-1">สร้างและกำหนดสิทธิ์การเข้าถึงสำหรับบทบาทต่างๆ ในระบบ</p>
+    <div className="grid grid-cols-12 gap-6">
+      {/* Sidebar */}
+      <div className="col-span-12 md:col-span-4 lg:col-span-3 card bg-base-100 shadow">
+        <div className="card-body ">
+          <h2 className="card-title">บทบาททั้งหมด</h2>
+          <div className="overflow-y-scroll h-[calc(200vh-300px)] space-y-2 mt-4 overflow-hidden">
+            {roles
+              .sort((a, b) => a.position - b.position)
+              .map((role) => (
+                <div
+                  key={role.id}
+                  className={cn(
+                    "flex justify-between items-center p-3 rounded-lg border cursor-pointer hover:bg-base-200",
+                    selectedRoleId === role.id ? "border-primary bg-primary/10" : "border-base-300"
+                  )}
+                  onClick={() => {
+                    setSelectedRoleId(role.id)
+                    setIsCreatingRole(false)
+                  }}
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: role.color }} />
+                    <span className="font-medium">{role.name}</span>
+                    <span className="badge badge-outline text-xs">{role.memberCount}</span>
+                  </div>
+                  <div className="flex gap-1">
+                    <button
+                      className="btn btn-ghost btn-xs"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        moveRole(role.id, "up")
+                      }}
+                      disabled={role.position === 1}
+                    >
+                      <ChevronUp size={14} />
+                    </button>
+                    <button
+                      className="btn btn-ghost btn-xs"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        moveRole(role.id, "down")
+                      }}
+                      disabled={role.position === roles.length}
+                    >
+                      <ChevronDown size={14} />
+                    </button>
+                  </div>
+                </div>
+              ))}
           </div>
-          <button
-            onClick={() => {
-              setIsCreatingRole(true)
-              setSelectedRoleId(null)
-            }}
-            className="btn btn-primary"
-          >
-            <Plus size={16} />
-            สร้างบทบาทใหม่
-          </button>
         </div>
+      </div>
 
-        <div className="grid grid-cols-12 gap-6">
-          {/* Roles List */}
-          <div className="col-span-12 md:col-span-4 lg:col-span-3 card bg-base-100 shadow">
-            <div className="card-body">
-              <h2 className="card-title">บทบาททั้งหมด</h2>
-              <p className="text-gray-500">จัดการบทบาทและลำดับความสำคัญ</p>
-              <div className="overflow-y-auto h-[calc(100vh-300px)]">
-                <div className="space-y-2">
-                  {roles
-                    .sort((a, b) => a.position - b.position)
-                    .map((role) => (
-                      <div
-                        key={role.id}
-                        className={cn(
-                          "p-3 rounded-lg border flex items-center justify-between cursor-pointer hover:bg-base-200",
-                          selectedRoleId === role.id ? "border-primary bg-primary/10" : "border-base-300"
-                        )}
-                        onClick={() => {
-                          setSelectedRoleId(role.id)
-                          setIsCreatingRole(false)
-                        }}
-                      >
-                        <div className="flex items-center gap-2">
-                          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: role.color }} />
-                          <span className="font-medium">{role.name}</span>
-                          <span className="badge badge-outline text-xs">
-                            {role.memberCount}
-                          </span>
-                        </div>
-                        <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button
-                            className="btn btn-ghost btn-xs"
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              moveRole(role.id, "up")
-                            }}
-                            disabled={role.position === 1}
-                          >
-                            <ChevronUp size={14} />
-                          </button>
-                          <button
-                            className="btn btn-ghost btn-xs"
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              moveRole(role.id, "down")
-                            }}
-                            disabled={role.position === roles.length}
-                          >
-                            <ChevronDown size={14} />
-                          </button>
-                          <Grip size={14} className="text-gray-400 ml-1" />
-                        </div>
-                      </div>
-                    ))}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Role Details */}
-          <div className="col-span-12 md:col-span-8 lg:col-span-9">
+      {/* Main Content */}
+      <div className="col-span-12 md:col-span-8 lg:col-span-9">
+        <div className="card bg-base-100 shadow h-full">
+          <div className="card-body">
             {isCreatingRole ? (
-              <div className="card bg-base-100 shadow">
-                <div className="card-body">
-                  <h2 className="card-title">สร้างบทบาทใหม่</h2>
-                  <p className="text-gray-500">กำหนดชื่อและสีสำหรับบทบาทใหม่</p>
-                  <div className="space-y-4">
-                    <div className="form-control">
-                      <label className="label">
-                        <span className="label-text">ชื่อบทบาท</span>
-                      </label>
-                      <input
-                        type="text"
-                        value={newRoleName}
-                        onChange={(e) => setNewRoleName(e.target.value)}
-                        placeholder="ใส่ชื่อบทบาท เช่น Manager, Staff"
-                        className="input input-bordered max-w-md"
-                      />
-                    </div>
+              <>
+                <h2 className="card-title">สร้างบทบาทใหม่</h2>
+                <p className="text-gray-500 mb-4">ใส่ชื่อและเลือกสีของบทบาท</p>
 
-                    <div className="form-control">
-                      <label className="label">
-                        <span className="label-text">สีของบทบาท</span>
-                      </label>
-                      <div className="flex items-center gap-3 max-w-md">
-                        <div className="w-10 h-10 rounded-lg border" style={{ backgroundColor: newRoleColor }} />
-                        <input
-                          type="color"
-                          value={newRoleColor}
-                          onChange={(e) => setNewRoleColor(e.target.value)}
-                          className="w-20 h-10 p-1"
-                        />
-                        <div className="dropdown">
-                          <label tabIndex={0} className="btn btn-outline btn-sm">
-                            สีที่แนะนำ
-                            <ChevronDown size={14} className="ml-1" />
-                          </label>
-                          <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
-                            {["#FF5733", "#3366FF", "#33CC66", "#FFCC33", "#CC33FF", "#FF3366", "#33CCFF"].map(
-                              (color) => (
-                                <li key={color}>
-                                  <a onClick={() => setNewRoleColor(color)}>
-                                    <div className="flex items-center gap-2">
-                                      <div className="w-4 h-4 rounded-full" style={{ backgroundColor: color }} />
-                                      <span>{color}</span>
-                                    </div>
-                                  </a>
-                                </li>
-                              )
-                            )}
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
+                <div className="form-control w-full max-w-md">
+                  <label className="label">
+                    <span className="label-text">ชื่อบทบาท</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={newRoleName}
+                    onChange={(e) => setNewRoleName(e.target.value)}
+                    className="input input-bordered"
+                    placeholder="เช่น Manager, Staff"
+                  />
+                </div>
 
-                    <div className="pt-4 flex gap-2">
-                      <button
-                        onClick={handleCreateRole}
-                        disabled={!newRoleName.trim()}
-                        className="btn btn-primary"
+                <div className="form-control w-full max-w-md mt-4">
+                  <label className="label">
+                    <span className="label-text">สีของบทบาท</span>
+                  </label>
+                  <div className="flex items-center gap-4">
+                    <div
+                      className="w-10 h-10 rounded-lg border"
+                      style={{ backgroundColor: newRoleColor }}
+                    />
+                    <input
+                      type="color"
+                      value={newRoleColor}
+                      onChange={(e) => setNewRoleColor(e.target.value)}
+                      className="input w-20 h-10 p-1"
+                    />
+                    <div className="dropdown">
+                      <label tabIndex={0} className="btn btn-sm btn-outline">
+                        สีที่แนะนำ <ChevronDown size={14} className="ml-1" />
+                      </label>
+                      <ul
+                        tabIndex={0}
+                        className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52"
                       >
-                        สร้างบทบาท
-                      </button>
-                      <button onClick={() => setIsCreatingRole(false)} className="btn btn-ghost">
-                        ยกเลิก
-                      </button>
+                        {["#FF5733", "#3366FF", "#33CC66", "#FFCC33", "#CC33FF", "#FF3366", "#33CCFF"].map(
+                          (color) => (
+                            <li key={color}>
+                              <a onClick={() => setNewRoleColor(color)}>
+                                <div className="flex items-center gap-2">
+                                  <div className="w-4 h-4 rounded-full" style={{ backgroundColor: color }} />
+                                  <span>{color}</span>
+                                </div>
+                              </a>
+                            </li>
+                          )
+                        )}
+                      </ul>
                     </div>
                   </div>
                 </div>
-              </div>
+
+                <div className="mt-6 flex gap-2">
+                  <button
+                    className="btn btn-primary"
+                    onClick={handleCreateRole}
+                    disabled={!newRoleName.trim()}
+                  >
+                    สร้างบทบาท
+                  </button>
+                  <button className="btn btn-ghost" onClick={() => setIsCreatingRole(false)}>
+                    ยกเลิก
+                  </button>
+                </div>
+              </>
             ) : selectedRole ? (
-              <div className="card bg-base-100 shadow">
-                <div className="card-body">
-                  <div className="flex justify-between">
-                    <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <div className="w-4 h-4 rounded-full" style={{ backgroundColor: selectedRole.color }} />
-                        <input
-                          value={selectedRole.name}
-                          onChange={(e) => updateRoleName(selectedRole.id, e.target.value)}
-                          className="input input-ghost text-xl font-bold p-0 w-auto"
-                        />
-                      </div>
-                      <p className="text-gray-500">
-                        ตำแหน่ง: {selectedRole.position} • สมาชิก: {selectedRole.memberCount} คน
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="color"
-                        value={selectedRole.color}
-                        onChange={(e) => updateRoleColor(selectedRole.id, e.target.value)}
-                        className="w-10 h-10 p-1"
+              <>
+                <div className="flex justify-between items-start">
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <div
+                        className="w-4 h-4 rounded-full"
+                        style={{ backgroundColor: selectedRole.color }}
                       />
-                      <div className="modal" id="delete-modal">
-                        <button
-                          onClick={() => setDeleteConfirmOpen(true)}
-                          className="btn btn-error btn-square"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                        {deleteConfirmOpen && (
-                          <div className="modal modal-open">
-                            <div className="modal-box">
-                              <h3 className="font-bold text-lg">ยืนยันการลบบทบาท</h3>
-                              <p className="py-4">
-                                คุณแน่ใจหรือไม่ที่จะลบบทบาท "{selectedRole.name}"? การกระทำนี้ไม่สามารถย้อนกลับได้
-                                และสมาชิกทั้งหมดที่มีบทบาทนี้จะถูกลบบทบาทออก
-                              </p>
-                              <div className="modal-action">
-                                <button onClick={() => setDeleteConfirmOpen(false)} className="btn">
-                                  ยกเลิก
-                                </button>
-                                <button onClick={handleDeleteRole} className="btn btn-error">
-                                  ยืนยันการลบ
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                      <button className="btn btn-ghost btn-square">
-                        <Save size={16} />
-                      </button>
+                      <input
+                        value={selectedRole.name}
+                        onChange={(e) => updateRoleName(selectedRole.id, e.target.value)}
+                        className="input input-ghost text-xl font-bold p-0 w-auto"
+                      />
                     </div>
+                    <p className="text-gray-500">
+                      ตำแหน่ง: {selectedRole.position} • สมาชิก: {selectedRole.memberCount} คน
+                    </p>
                   </div>
 
-                  <div className="tabs">
-                    <div className="tabs-boxed p-1 mb-4">
-                      <a className="tab tab-active">สิทธิ์การใช้งาน</a>
-                      <a className="tab">สมาชิก</a>
-                      <a className="tab">การแสดงผล</a>
-                    </div>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="color"
+                      value={selectedRole.color}
+                      onChange={(e) => updateRoleColor(selectedRole.id, e.target.value)}
+                      className="w-10 h-10 p-1"
+                    />
+                    <button
+                      onClick={() => setDeleteConfirmOpen(true)}
+                      className="btn btn-error btn-square"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                </div>
 
-                    <div className="space-y-6">
-                      {/* Permissions Tab Content */}
-                      <div className="grid gap-6">
-                        {Object.entries(permissionGroups).map(([groupKey, group]) => (
-                          <div key={groupKey} className="space-y-3">
-                            <h3 className="text-lg font-semibold">{group.label}</h3>
-                            <div className="space-y-2">
-                              {Object.entries(group.permissions).map(([permKey, permLabel]) => (
-                                <div
-                                  key={permKey}
-                                  className="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-base-200"
-                                >
-                                  <span>{permLabel}</span>
-                                  <input
-                                    type="checkbox"
-                                    className="toggle toggle-primary"
-                                    checked={selectedRole.permissions[groupKey][permKey]}
-                                    onChange={(e) => updatePermission(groupKey, permKey, e.target.checked)}
-                                  />
-                                </div>
-                              ))}
-                            </div>
+                <div className="tabs tabs-boxed mt-6">
+                  <a className="tab tab-active">สิทธิ์การใช้งาน</a>
+                  <a className="tab">สมาชิก</a>
+                </div>
+
+                <div className="mt-4 space-y-6">
+                  {Object.entries(permissionGroups).map(([groupKey, group]) => (
+                    <div key={groupKey} className="space-y-3">
+                      <h3 className="text-lg font-semibold">{group.label}</h3>
+                      <div className="space-y-2">
+                        {Object.entries(group.permissions).map(([permKey, permLabel]) => (
+                          <div
+                            key={permKey}
+                            className="flex items-center justify-between px-4 py-2 rounded-lg hover:bg-base-200"
+                          >
+                            <span>{permLabel}</span>
+                            <input
+                              type="checkbox"
+                              className="toggle toggle-primary"
+                              checked={selectedRole.permissions[groupKey][permKey]}
+                              onChange={(e) =>
+                                updatePermission(groupKey, permKey, e.target.checked)
+                              }
+                            />
                           </div>
                         ))}
                       </div>
                     </div>
-                  </div>
+                  ))}
                 </div>
-              </div>
+              </>
             ) : (
-              <div className="card bg-base-100 shadow">
-                <div className="card-body">
-                  <h2 className="text-xl font-semibold text-gray-500">
-                    กรุณาเลือกบทบาทเพื่อดูรายละเอียด
-                  </h2>
-                </div>
+              <div className="flex justify-center items-center h-full text-gray-500">
+                กรุณาเลือกบทบาทเพื่อดูรายละเอียด
               </div>
             )}
           </div>
         </div>
       </div>
+    </div>
+  </div>
   )
 }
 
