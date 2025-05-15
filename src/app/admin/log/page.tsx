@@ -347,7 +347,7 @@ const ActivityLogPage = () => {
 
             <div className="form-control">
               <label className="label">
-                <span className="label-text">ร้านกาแฟ</span>
+                <span className="label-text">ร้าน</span>
               </label>
               <select 
                 className="select select-bordered w-full"
