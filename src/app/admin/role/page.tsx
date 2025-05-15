@@ -311,10 +311,8 @@ export default function RolesPage() {
             {isCreatingRole ? (
               <>
                 <h2 className="card-title">สร้างบทบาทใหม่</h2>
-                <p className="text-gray-500 mb-4">ใส่ชื่อและเลือกสีของบทบาท</p>
-
-                <div className="form-control w-full max-w-md">
-                  <label className="label">
+                <div className="form-control w-full max-w-md flex flex-col">
+                  <label className="label mb-4">
                     <span className="label-text">ชื่อบทบาท</span>
                   </label>
                   <input
@@ -415,10 +413,6 @@ export default function RolesPage() {
                   </div>
                 </div>
 
-                <div className="tabs tabs-boxed mt-6">
-                  <a className="tab tab-active">สิทธิ์การใช้งาน</a>
-                  <a className="tab">สมาชิก</a>
-                </div>
 
                 <div className="mt-4 space-y-6">
                   {Object.entries(permissionGroups).map(([groupKey, group]) => (
@@ -447,7 +441,7 @@ export default function RolesPage() {
                 </div>
               </>
             ) : (
-              <div className="flex justify-center items-center h-full text-gray-500">
+              <div className="flex justify-center mt-15 h-full text-gray-500">
                 กรุณาเลือกบทบาทเพื่อดูรายละเอียด
               </div>
             )}
