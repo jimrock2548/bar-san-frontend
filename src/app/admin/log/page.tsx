@@ -347,10 +347,10 @@ const ActivityLogPage = () => {
             <RefreshCwIcon className="h-4 w-4 mr-2" />
             รีเซ็ตตัวกรอง
           </button>
-          <button className="btn btn-outline" onClick={exportLogs}>
+          {/*<button className="btn btn-outline" onClick={exportLogs}>
             <DownloadIcon className="h-4 w-4 mr-2" />
             ส่งออก CSV
-          </button>
+          </button>*/}
         </div>
       </div>
 

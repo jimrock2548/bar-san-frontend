@@ -7,12 +7,14 @@ import { CalendarRange, ChevronDown, Table2, Users, CalendarDays } from "lucide-
 import { useState } from "react"
 import Status from '@/app/components/status'
 import { DayPicker } from "react-day-picker"
+import ReservationDetailModal from "@/app/components/reservationDetail"
 
 export default function Page() {
   const router = useRouter()
   const [date, setDate] = useState<Date>()
   const [zoneFilter, setZoneFilter] = useState<string>('')
   const [statusFilter, setStatusFilter] = useState<string>('All')
+  const [viewingReservation, setViewingReservation] = useState<string | null>(null)
 
   const user = {
     role: "superadmin",
@@ -58,8 +60,8 @@ export default function Page() {
   })
 
   const handleOpenDetailModal = (id: string) => {
-    router.push(`/admin/reservations/${id}`)
-  }
+  setViewingReservation(id)
+}
 
   const handleSelectTable = (bookingId: string, tableId: string) => {
     setSelectedTable((prev) => ({ ...prev, [bookingId]: tableId }))
@@ -141,7 +143,7 @@ export default function Page() {
             {date ? date.toLocaleDateString() : "Pick a date"}
           </button>
           <div popover="auto" id="rdp-popover" className="dropdown" style={{ positionAnchor: "--rdp" } as React.CSSProperties}>
-            <DayPicker className="react-day-picker" mode="single" selected={date} onSelect={setDate} />
+            <DayPicker className="react-day-picker text-lg" mode="single" selected={date} onSelect={setDate} />
           </div>
         </div>
 
@@ -211,6 +213,22 @@ export default function Page() {
           ))}
         </div>
       </div>
+      {viewingReservation && (
+  <ReservationDetailModal
+    reservation={{
+      id: viewingReservation,
+      reservationNumber: "RSV" + viewingReservation.padStart(4, '0'),
+      date: allReservations.find(r => r.id === viewingReservation)?.date || "",
+      time: allReservations.find(r => r.id === viewingReservation)?.time || "",
+      guests: 2,
+      zone: allReservations.find(r => r.id === viewingReservation)?.zone || "",
+      name: allReservations.find(r => r.id === viewingReservation)?.name || "",
+      email: "example@example.com",
+      phone: "123-456-789"
+    }}
+    onClose={() => setViewingReservation(null)}
+  />
+)}
     </div>
   )
 }

@@ -91,8 +91,8 @@ export default function AdminTablesPage() {
           <h1 className="text-3xl font-bold">จัดการโต๊ะ</h1>
           <p className="text-gray-500">จัดการโต๊ะทั้งหมดในร้าน</p>
         </div>
-        <button className="btn btn-primary" onClick={handleAddTable}>
-          <Plus className="w-4 h-4 mr-2" />
+        <button className="btn btn-neutral" onClick={handleAddTable}>
+          <Plus className="w-4 h-4 mr-2 " />
           เพิ่มโต๊ะใหม่
         </button>
       </div>
