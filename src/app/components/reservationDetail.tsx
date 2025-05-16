@@ -35,7 +35,7 @@ export default function ReservationDetailModal({ reservation, onClose }: Reserva
           <div className="mb-6">
             <p className="text-gray-500">Reservation Number: {reservation.reservationNumber}</p>
           </div>
-          
+             <div className="divider"></div>
           <div className="space-y-4 mb-6">
             <div>
               <p className="text-gray-500">Date</p>
