@@ -573,11 +573,6 @@ const ActivityLogPage = () => {
                       </td>
                       <td>
                         <div className="flex items-center gap-2">
-                          <div className="avatar placeholder">
-                            <div className="bg-neutral text-neutral-content rounded-full w-8">
-                              <UserIcon className="h-4 w-4" />
-                            </div>
-                          </div>
                           <div>
                             <div className="font-bold">{log.admin.name}</div>
                             <div className="text-xs text-gray-500">
