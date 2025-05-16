@@ -1,7 +1,9 @@
-"use client"
+"use client";
+import '@/app/globals.css';
 
-import { useState, useEffect } from "react"
-import { 
+import { useState, useEffect } from "react";
+import { DayPicker } from 'react-day-picker'
+import {
   DownloadIcon,
   FilterIcon,
   SearchIcon,
@@ -21,23 +23,68 @@ import {
   UnlockIcon,
   LogInIcon,
   LogOutIcon,
-} from "lucide-react"
-import { format } from "date-fns"
-import { th } from "date-fns/locale"
+} from "lucide-react";
+import { format } from "date-fns";
+import { th } from "date-fns/locale";
 
 // Mock data for activity logs (same as before)
 const generateMockLogs = () => {
   const actions = [
-    { type: "login", icon: <LogInIcon className="h-4 w-4" />, label: "เข้าสู่ระบบ", severity: "info" },
-    { type: "logout", icon: <LogOutIcon className="h-4 w-4" />, label: "ออกจากระบบ", severity: "info" },
-    { type: "create", icon: <PlusIcon className="h-4 w-4" />, label: "สร้าง", severity: "success" },
-    { type: "update", icon: <EditIcon className="h-4 w-4" />, label: "แก้ไข", severity: "warning" },
-    { type: "delete", icon: <TrashIcon className="h-4 w-4" />, label: "ลบ", severity: "danger" },
-    { type: "view", icon: <EyeIcon className="h-4 w-4" />, label: "ดู", severity: "info" },
-    { type: "lock", icon: <LockIcon className="h-4 w-4" />, label: "ล็อค", severity: "warning" },
-    { type: "unlock", icon: <UnlockIcon className="h-4 w-4" />, label: "ปลดล็อค", severity: "success" },
-    { type: "settings", icon: <SettingsIcon className="h-4 w-4" />, label: "ตั้งค่า", severity: "info" },
-  ]
+    {
+      type: "login",
+      icon: <LogInIcon className="h-4 w-4" />,
+      label: "เข้าสู่ระบบ",
+      severity: "info",
+    },
+    {
+      type: "logout",
+      icon: <LogOutIcon className="h-4 w-4" />,
+      label: "ออกจากระบบ",
+      severity: "info",
+    },
+    {
+      type: "create",
+      icon: <PlusIcon className="h-4 w-4" />,
+      label: "สร้าง",
+      severity: "success",
+    },
+    {
+      type: "update",
+      icon: <EditIcon className="h-4 w-4" />,
+      label: "แก้ไข",
+      severity: "warning",
+    },
+    {
+      type: "delete",
+      icon: <TrashIcon className="h-4 w-4" />,
+      label: "ลบ",
+      severity: "danger",
+    },
+    {
+      type: "view",
+      icon: <EyeIcon className="h-4 w-4" />,
+      label: "ดู",
+      severity: "info",
+    },
+    {
+      type: "lock",
+      icon: <LockIcon className="h-4 w-4" />,
+      label: "ล็อค",
+      severity: "warning",
+    },
+    {
+      type: "unlock",
+      icon: <UnlockIcon className="h-4 w-4" />,
+      label: "ปลดล็อค",
+      severity: "success",
+    },
+    {
+      type: "settings",
+      icon: <SettingsIcon className="h-4 w-4" />,
+      label: "ตั้งค่า",
+      severity: "info",
+    },
+  ];
 
   const targets = [
     { type: "user", label: "ผู้ใช้" },
@@ -47,7 +94,7 @@ const generateMockLogs = () => {
     { type: "role", label: "บทบาท" },
     { type: "permission", label: "สิทธิ์" },
     { type: "setting", label: "การตั้งค่า" },
-  ]
+  ];
 
   const admins = [
     { id: 1, name: "สมชาย ใจดี", role: "Admin", cafe: "BarSan" },
@@ -56,54 +103,58 @@ const generateMockLogs = () => {
     { id: 4, name: "วิชัย ชาญชัย", role: "Manager", cafe: "BarSan" },
     { id: 5, name: "นภา สวยงาม", role: "Manager", cafe: "NOIR" },
     { id: 6, name: "ประสิทธิ์ ทำงานดี", role: "Staff", cafe: "Neo Brutal" },
-  ]
+  ];
 
-  const logs = []
-  const now = new Date()
+  const logs = [];
+  const now = new Date();
 
   // Generate 100 random logs
   for (let i = 0; i < 100; i++) {
-    const action = actions[Math.floor(Math.random() * actions.length)]
-    const target = targets[Math.floor(Math.random() * targets.length)]
-    const admin = admins[Math.floor(Math.random() * admins.length)]
+    const action = actions[Math.floor(Math.random() * actions.length)];
+    const target = targets[Math.floor(Math.random() * targets.length)];
+    const admin = admins[Math.floor(Math.random() * admins.length)];
 
     // Random date within the last 30 days
-    const date = new Date(now)
-    date.setDate(date.getDate() - Math.floor(Math.random() * 30))
-    date.setHours(Math.floor(Math.random() * 24), Math.floor(Math.random() * 60), Math.floor(Math.random() * 60))
+    const date = new Date(now);
+    date.setDate(date.getDate() - Math.floor(Math.random() * 30));
+    date.setHours(
+      Math.floor(Math.random() * 24),
+      Math.floor(Math.random() * 60),
+      Math.floor(Math.random() * 60)
+    );
 
     // Generate a descriptive message based on the action and target
-    let details = ""
-    const targetId = Math.floor(Math.random() * 1000) + 1
+    let details = "";
+    const targetId = Math.floor(Math.random() * 1000) + 1;
 
     switch (action.type) {
       case "login":
-        details = `เข้าสู่ระบบ`
-        break
+        details = `เข้าสู่ระบบ`;
+        break;
       case "logout":
-        details = `ออกจากระบบ`
-        break
+        details = `ออกจากระบบ`;
+        break;
       case "create":
-        details = `สร้าง${target.label}ใหม่ (ID: ${targetId})`
-        break
+        details = `สร้าง${target.label}ใหม่ (ID: ${targetId})`;
+        break;
       case "update":
-        details = `แก้ไข${target.label} (ID: ${targetId})`
-        break
+        details = `แก้ไข${target.label} (ID: ${targetId})`;
+        break;
       case "delete":
-        details = `ลบ${target.label} (ID: ${targetId})`
-        break
+        details = `ลบ${target.label} (ID: ${targetId})`;
+        break;
       case "view":
-        details = `ดูรายละเอียด${target.label} (ID: ${targetId})`
-        break
+        details = `ดูรายละเอียด${target.label} (ID: ${targetId})`;
+        break;
       case "lock":
-        details = `ล็อค${target.label} (ID: ${targetId})`
-        break
+        details = `ล็อค${target.label} (ID: ${targetId})`;
+        break;
       case "unlock":
-        details = `ปลดล็อค${target.label} (ID: ${targetId})`
-        break
+        details = `ปลดล็อค${target.label} (ID: ${targetId})`;
+        break;
       case "settings":
-        details = `เปลี่ยนการตั้งค่า${target.label}`
-        break
+        details = `เปลี่ยนการตั้งค่า${target.label}`;
+        break;
     }
 
     logs.push({
@@ -113,163 +164,179 @@ const generateMockLogs = () => {
       action: action,
       target: target,
       details: details,
-      ipAddress: `192.168.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`,
-    })
+      ipAddress: `192.168.${Math.floor(Math.random() * 255)}.${Math.floor(
+        Math.random() * 255
+      )}`,
+    });
   }
 
   // Sort logs by timestamp (newest first)
-  return logs.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
-}
+  return logs.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+};
 const ActivityLogPage = () => {
-  const [logs, setLogs] = useState([])
-  const [filteredLogs, setFilteredLogs] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [currentPage, setCurrentPage] = useState(1)
-  const [searchTerm, setSearchTerm] = useState("")
-  const [actionFilter, setActionFilter] = useState("")
-  const [adminFilter, setAdminFilter] = useState("")
-  const [cafeFilter, setCafeFilter] = useState("")
+  const [logs, setLogs] = useState([]);
+  const [filteredLogs, setFilteredLogs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [actionFilter, setActionFilter] = useState("");
+  const [adminFilter, setAdminFilter] = useState("");
+  const [cafeFilter, setCafeFilter] = useState("");
   const [dateRange, setDateRange] = useState({
     from: undefined,
     to: undefined,
-  })
-  const [activeTab, setActiveTab] = useState("all")
+  });
+  const [activeTab, setActiveTab] = useState("all");
 
-  const logsPerPage = 10
+  const logsPerPage = 10;
 
   // Simulate fetching logs from an API
   useEffect(() => {
     const fetchLogs = async () => {
-      setLoading(true)
+      setLoading(true);
       try {
         // In a real app, this would be an API call
-        const data = generateMockLogs()
-        setLogs(data)
-        setFilteredLogs(data)
+        const data = generateMockLogs();
+        setLogs(data);
+        setFilteredLogs(data);
       } catch (error) {
-        console.error("Error fetching logs:", error)
+        console.error("Error fetching logs:", error);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchLogs()
-  }, [])
+    fetchLogs();
+  }, []);
 
   // Apply filters when any filter changes
   useEffect(() => {
-    let result = [...logs]
+    let result = [...logs];
 
     // Filter by tab (severity)
     if (activeTab !== "all") {
-      result = result.filter((log) => log.action.severity === activeTab)
+      result = result.filter((log) => log.action.severity === activeTab);
     }
 
     // Filter by search term
     if (searchTerm) {
-      const term = searchTerm.toLowerCase()
+      const term = searchTerm.toLowerCase();
       result = result.filter(
         (log) =>
           log.admin.name.toLowerCase().includes(term) ||
           log.details.toLowerCase().includes(term) ||
-          log.ipAddress.includes(term),
-      )
+          log.ipAddress.includes(term)
+      );
     }
 
     // Filter by action type
     if (actionFilter) {
-      result = result.filter((log) => log.action.type === actionFilter)
+      result = result.filter((log) => log.action.type === actionFilter);
     }
 
     // Filter by admin
     if (adminFilter) {
-      result = result.filter((log) => log.admin.id === Number.parseInt(adminFilter))
+      result = result.filter(
+        (log) => log.admin.id === Number.parseInt(adminFilter)
+      );
     }
 
     // Filter by cafe
     if (cafeFilter) {
-      result = result.filter((log) => log.admin.cafe === cafeFilter)
+      result = result.filter((log) => log.admin.cafe === cafeFilter);
     }
 
     // Filter by date range
     if (dateRange.from) {
-      result = result.filter((log) => log.timestamp >= dateRange.from)
+      result = result.filter((log) => log.timestamp >= dateRange.from);
     }
     if (dateRange.to) {
-      const endDate = new Date(dateRange.to)
-      endDate.setHours(23, 59, 59, 999)
-      result = result.filter((log) => log.timestamp <= endDate)
+      const endDate = new Date(dateRange.to);
+      endDate.setHours(23, 59, 59, 999);
+      result = result.filter((log) => log.timestamp <= endDate);
     }
 
-    setFilteredLogs(result)
-    setCurrentPage(1) // Reset to first page when filters change
-  }, [logs, searchTerm, actionFilter, adminFilter, cafeFilter, dateRange, activeTab])
+    setFilteredLogs(result);
+    setCurrentPage(1); // Reset to first page when filters change
+  }, [
+    logs,
+    searchTerm,
+    actionFilter,
+    adminFilter,
+    cafeFilter,
+    dateRange,
+    activeTab,
+  ]);
 
   // Get current logs for pagination
-  const indexOfLastLog = currentPage * logsPerPage
-  const indexOfFirstLog = indexOfLastLog - logsPerPage
-  const currentLogs = filteredLogs.slice(indexOfFirstLog, indexOfLastLog)
-  const totalPages = Math.ceil(filteredLogs.length / logsPerPage)
+  const indexOfLastLog = currentPage * logsPerPage;
+  const indexOfFirstLog = indexOfLastLog - logsPerPage;
+  const currentLogs = filteredLogs.slice(indexOfFirstLog, indexOfLastLog);
+  const totalPages = Math.ceil(filteredLogs.length / logsPerPage);
 
   // Reset filters
   const resetFilters = () => {
-    setSearchTerm("")
-    setActionFilter("")
-    setAdminFilter("")
-    setCafeFilter("")
-    setDateRange({ from: undefined, to: undefined })
-    setActiveTab("all")
-  }
+    setSearchTerm("");
+    setActionFilter("");
+    setAdminFilter("");
+    setCafeFilter("");
+    setDateRange({ from: undefined, to: undefined });
+    setActiveTab("all");
+  };
 
   // Export logs as CSV
   const exportLogs = () => {
     // In a real app, this would generate and download a CSV file
-    alert("ฟังก์ชันส่งออกข้อมูลจะถูกเพิ่มในอนาคต")
-  }
+    alert("ฟังก์ชันส่งออกข้อมูลจะถูกเพิ่มในอนาคต");
+  };
 
   // Get unique admins for filter dropdown
-  const uniqueAdmins = [...new Map(logs.map((log) => [log.admin.id, log.admin])).values()]
+  const uniqueAdmins = [
+    ...new Map(logs.map((log) => [log.admin.id, log.admin])).values(),
+  ];
 
   // Get unique cafes for filter dropdown
-  const uniqueCafes = [...new Set(logs.map((log) => log.admin.cafe))]
+  const uniqueCafes = [...new Set(logs.map((log) => log.admin.cafe))];
 
   // Get unique action types for filter dropdown
-  const uniqueActions = [...new Map(logs.map((log) => [log.action.type, log.action])).values()]
+  const uniqueActions = [
+    ...new Map(logs.map((log) => [log.action.type, log.action])).values(),
+  ];
 
   // Format date for display
   const formatDate = (date) => {
-    return format(date, "d MMM yyyy HH:mm:ss", { locale: th })
-  }
+    return format(date, "d MMM yyyy HH:mm:ss", { locale: th });
+  };
 
   // Get badge color based on severity
   const getBadgeVariant = (severity) => {
     switch (severity) {
       case "danger":
-        return "destructive"
+        return "destructive";
       case "warning":
-        return "warning"
+        return "warning";
       case "success":
-        return "success"
+        return "success";
       case "info":
       default:
-        return "secondary"
+        return "secondary";
     }
-  }
+  };
 
   // Get icon based on severity for tabs
   const getSeverityIcon = (severity) => {
     switch (severity) {
       case "danger":
-        return <XCircleIcon className="h-4 w-4" />
+        return <XCircleIcon className="h-4 w-4" />;
       case "warning":
-        return <AlertCircleIcon className="h-4 w-4" />
+        return <AlertCircleIcon className="h-4 w-4" />;
       case "success":
-        return <CheckCircleIcon className="h-4 w-4" />
+        return <CheckCircleIcon className="h-4 w-4" />;
       case "info":
       default:
-        return <InfoIcon className="h-4 w-4" />
+        return <InfoIcon className="h-4 w-4" />;
     }
-  }
+  };
 
   return (
     <div className="container mx-auto py-6 space-y-6">
@@ -291,7 +358,7 @@ const ActivityLogPage = () => {
         <div className="card-body">
           <h2 className="card-title">ตัวกรองข้อมูล</h2>
           <p className="text-gray-500">กรองบันทึกกิจกรรมตามเงื่อนไขต่างๆ</p>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="form-control">
               <label className="label">
@@ -299,9 +366,9 @@ const ActivityLogPage = () => {
               </label>
               <label className="input input-bordered flex items-center gap-2">
                 <SearchIcon className="h-4 w-4" />
-                <input 
-                  type="text" 
-                  className="grow" 
+                <input
+                  type="text"
+                  className="grow"
                   placeholder="ค้นหาตามชื่อ, รายละเอียด, IP"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
@@ -313,7 +380,7 @@ const ActivityLogPage = () => {
               <label className="label">
                 <span className="label-text">ประเภทการกระทำ</span>
               </label>
-              <select 
+              <select
                 className="select select-bordered w-full"
                 value={actionFilter}
                 onChange={(e) => setActionFilter(e.target.value)}
@@ -331,7 +398,7 @@ const ActivityLogPage = () => {
               <label className="label">
                 <span className="label-text">ผู้ดูแลระบบ</span>
               </label>
-              <select 
+              <select
                 className="select select-bordered w-full"
                 value={adminFilter}
                 onChange={(e) => setAdminFilter(e.target.value)}
@@ -349,7 +416,7 @@ const ActivityLogPage = () => {
               <label className="label">
                 <span className="label-text">ร้าน</span>
               </label>
-              <select 
+              <select
                 className="select select-bordered w-full"
                 value={cafeFilter}
                 onChange={(e) => setCafeFilter(e.target.value)}
@@ -367,49 +434,62 @@ const ActivityLogPage = () => {
               <label className="label">
                 <span className="label-text">ช่วงวันที่</span>
               </label>
-              <div className="flex flex-wrap gap-2">
-                <div className="join">
-                  <button className="btn btn-outline join-item">
-                    <CalendarIcon className="h-4 w-4 mr-2" />
-                    {dateRange.from ? (
-                      dateRange.to ? (
-                        <>
-                          {format(dateRange.from, "d MMM yyyy", { locale: th })} -{" "}
-                          {format(dateRange.to, "d MMM yyyy", { locale: th })}
-                        </>
-                      ) : (
-                        format(dateRange.from, "d MMM yyyy", { locale: th })
-                      )
+
+              <div className="flex items-center gap-2">
+                <button
+                  popoverTarget="rdp-popover"
+                  className="input input-bordered justify-start text-left"
+                  style={{ anchorName: "--rdp" } as React.CSSProperties}
+                >
+                  <CalendarIcon className="h-4 w-4 mr-2" />
+                  {dateRange.from ? (
+                    dateRange.to ? (
+                      <>
+                        {format(dateRange.from, "d MMM yyyy", { locale: th })} -{" "}
+                        {format(dateRange.to, "d MMM yyyy", { locale: th })}
+                      </>
                     ) : (
-                      <span>เลือกช่วงวันที่</span>
-                    )}
-                  </button>
-                  <input 
-                    type="date" 
-                    className="join-item"
-                    onChange={(e) => {
-                      const from = e.target.value ? new Date(e.target.value) : undefined
-                      setDateRange(prev => ({...prev, from}))
-                    }}
-                  />
-                  <input 
-                    type="date" 
-                    className="join-item"
-                    onChange={(e) => {
-                      const to = e.target.value ? new Date(e.target.value) : undefined
-                      setDateRange(prev => ({...prev, to}))
-                    }}
-                  />
-                </div>
+                      format(dateRange.from, "d MMM yyyy", { locale: th })
+                    )
+                  ) : (
+                    <span>เลือกช่วงวันที่</span>
+                  )}
+                </button>
 
                 {(dateRange.from || dateRange.to) && (
-                  <button 
-                    className="btn btn-ghost btn-sm" 
-                    onClick={() => setDateRange({ from: undefined, to: undefined })}
+                  <button
+                    className="btn btn-ghost btn-sm"
+                    onClick={() =>
+                      setDateRange({ from: undefined, to: undefined })
+                    }
                   >
-                    รีเซ็ตวันที่
+                    รีเซ็ต
                   </button>
                 )}
+              </div>
+
+              <div
+                popover="auto"
+                id="rdp-popover"
+                className="dropdown z-50"
+                style={{ positionAnchor: "--rdp" } as React.CSSProperties}
+              >
+                <DayPicker
+                  className="react-day-picker rounded-lg p-2 text-lg"
+                  mode="range"
+                  selected={dateRange}
+                  onSelect={(range) => setDateRange(range)}
+                  locale={th}
+                  footer={
+                    dateRange.from && dateRange.to ? (
+                      <p className="text-sm text-gray-400 px-2">
+                        เลือกแล้ว:{" "}
+                        {format(dateRange.from, "d MMM yyyy", { locale: th })} -{" "}
+                        {format(dateRange.to, "d MMM yyyy", { locale: th })}
+                      </p>
+                    ) : null
+                  }
+                />
               </div>
             </div>
           </div>
@@ -424,35 +504,35 @@ const ActivityLogPage = () => {
           </p>
 
           <div className="tabs tabs-boxed">
-            <a 
+            <a
               className={`tab ${activeTab === "all" ? "tab-active" : ""}`}
               onClick={() => setActiveTab("all")}
             >
               <FilterIcon className="h-4 w-4 mr-2" />
               ทั้งหมด
             </a>
-            <a 
+            <a
               className={`tab ${activeTab === "danger" ? "tab-active" : ""}`}
               onClick={() => setActiveTab("danger")}
             >
               <XCircleIcon className="h-4 w-4 mr-2" />
               สำคัญมาก
             </a>
-            <a 
+            <a
               className={`tab ${activeTab === "warning" ? "tab-active" : ""}`}
               onClick={() => setActiveTab("warning")}
             >
               <AlertCircleIcon className="h-4 w-4 mr-2" />
               คำเตือน
             </a>
-            <a 
+            <a
               className={`tab ${activeTab === "success" ? "tab-active" : ""}`}
               onClick={() => setActiveTab("success")}
             >
               <CheckCircleIcon className="h-4 w-4 mr-2" />
               สำเร็จ
             </a>
-            <a 
+            <a
               className={`tab ${activeTab === "info" ? "tab-active" : ""}`}
               onClick={() => setActiveTab("info")}
             >
@@ -468,7 +548,9 @@ const ActivityLogPage = () => {
               </div>
             ) : currentLogs.length === 0 ? (
               <div className="text-center py-10">
-                <p className="text-gray-500">ไม่พบข้อมูลที่ตรงกับเงื่อนไขการค้นหา</p>
+                <p className="text-gray-500">
+                  ไม่พบข้อมูลที่ตรงกับเงื่อนไขการค้นหา
+                </p>
               </div>
             ) : (
               <table className="table">
@@ -485,7 +567,9 @@ const ActivityLogPage = () => {
                   {currentLogs.map((log) => (
                     <tr key={log.id} className="hover">
                       <td>
-                        <div className="text-sm">{formatDate(log.timestamp)}</div>
+                        <div className="text-sm">
+                          {formatDate(log.timestamp)}
+                        </div>
                       </td>
                       <td>
                         <div className="flex items-center gap-2">
@@ -503,7 +587,11 @@ const ActivityLogPage = () => {
                         </div>
                       </td>
                       <td>
-                        <span className={`badge gap-1 ${getBadgeVariant(log.action.severity)}`}>
+                        <span
+                          className={`badge gap-1 ${getBadgeVariant(
+                            log.action.severity
+                          )}`}
+                        >
                           {log.action.icon}
                           {log.action.label}
                         </span>
@@ -523,39 +611,43 @@ const ActivityLogPage = () => {
 
           <div className="flex justify-between items-center">
             <div className="text-sm text-gray-500">
-              แสดง {indexOfFirstLog + 1}-{Math.min(indexOfLastLog, filteredLogs.length)} จาก {filteredLogs.length} รายการ
+              แสดง {indexOfFirstLog + 1}-
+              {Math.min(indexOfLastLog, filteredLogs.length)} จาก{" "}
+              {filteredLogs.length} รายการ
             </div>
 
             <div className="join">
-              <button 
-                className="join-item btn" 
+              <button
+                className="join-item btn"
                 onClick={() => setCurrentPage(currentPage - 1)}
                 disabled={currentPage === 1}
               >
                 «
               </button>
-              
+
               {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                let pageNum
+                let pageNum;
                 if (totalPages <= 5) {
-                  pageNum = i + 1
+                  pageNum = i + 1;
                 } else if (currentPage <= 3) {
-                  pageNum = i + 1
+                  pageNum = i + 1;
                 } else if (currentPage >= totalPages - 2) {
-                  pageNum = totalPages - 4 + i
+                  pageNum = totalPages - 4 + i;
                 } else {
-                  pageNum = currentPage - 2 + i
+                  pageNum = currentPage - 2 + i;
                 }
 
                 return (
                   <button
                     key={i}
-                    className={`join-item btn ${currentPage === pageNum ? "btn-active" : ""}`}
+                    className={`join-item btn ${
+                      currentPage === pageNum ? "btn-active" : ""
+                    }`}
                     onClick={() => setCurrentPage(pageNum)}
                   >
                     {pageNum}
                   </button>
-                )
+                );
               })}
 
               {totalPages > 5 && currentPage < totalPages - 2 && (
@@ -569,9 +661,9 @@ const ActivityLogPage = () => {
                   </button>
                 </>
               )}
-              
-              <button 
-                className="join-item btn" 
+
+              <button
+                className="join-item btn"
                 onClick={() => setCurrentPage(currentPage + 1)}
                 disabled={currentPage === totalPages}
               >
@@ -582,7 +674,7 @@ const ActivityLogPage = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ActivityLogPage
+export default ActivityLogPage;
