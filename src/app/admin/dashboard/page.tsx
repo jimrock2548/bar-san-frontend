@@ -224,7 +224,7 @@ export default function Page() {
       zone: allReservations.find(r => r.id === viewingReservation)?.zone || "",
       name: allReservations.find(r => r.id === viewingReservation)?.name || "",
       email: "example@example.com",
-      phone: "123-456-789",
+      phone: "123-456-789"
     }}
     onClose={() => setViewingReservation(null)}
   />
