@@ -46,9 +46,9 @@ export default function AdminLayout({ children, user, selectedCafe, onCafeChange
 
   /*if (user?.role === "superadmin") {
     navigation.push({ name: "จัดการผู้ใช้", href: "/admin/users", icon: Users })
-  }*/
+  }
 
-  navigation.push({ name: "ตั้งค่า", href: "/admin/settings", icon: Settings })
+  navigation.push({ name: "ตั้งค่า", href: "/admin/settings", icon: Settings })*/
 
   return (
     <div className="flex min-h-screen">
