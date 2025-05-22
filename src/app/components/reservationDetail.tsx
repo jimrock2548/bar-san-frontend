@@ -3,10 +3,12 @@
 import { X } from "lucide-react"
 import { format } from "date-fns"
 import { th } from "date-fns/locale"
+import Status from "./status"
 
 interface ReservationDetailModalProps {
   reservation: {
     id: string
+    bar: string
     reservationNumber: string
     date: string
     time: string
@@ -32,8 +34,9 @@ export default function ReservationDetailModal({ reservation, onClose }: Reserva
             </button>
           </div>
           
-          <div className="mb-6">
+          <div className="mb-6 flex justify-between">
             <p className="text-gray-500">Reservation Number: {reservation.reservationNumber}</p>
+            <Status statusString={reservation.bar} />
           </div>
              <div className="divider"></div>
           <div className="space-y-4 mb-6">

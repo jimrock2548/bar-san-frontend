@@ -88,12 +88,12 @@ export default function AdminTablesPage() {
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-3xl font-bold">จัดการโต๊ะ</h1>
-          <p className="text-gray-500">จัดการโต๊ะทั้งหมดในร้าน</p>
+          <h1 className="text-3xl font-bold">Manage Table</h1>
+          <p className="text-gray-500">Manage All Talble</p>
         </div>
         <button className="btn btn-neutral" onClick={handleAddTable}>
           <Plus className="w-4 h-4 mr-2 " />
-          เพิ่มโต๊ะใหม่
+          Add a new table
         </button>
       </div>
 
@@ -102,7 +102,7 @@ export default function AdminTablesPage() {
           <div key={table.id} className={`card bg-base-100 shadow ${!table.isActive && "opacity-60"}`}>
             <div className="card-body">
               <div className="flex justify-between items-start">
-                <h2 className="card-title">โต๊ะ {table.number}</h2>
+                <h2 className="card-title">Table {table.number}</h2>
                 <div className="flex gap-2">
                   <input
                     type="checkbox"
@@ -188,7 +188,7 @@ export default function AdminTablesPage() {
               <button className="btn btn-outline" onClick={() => setIsDialogOpen(false)}>
                 ยกเลิก
               </button>
-              <button className="btn btn-primary" onClick={handleSaveTable}>
+              <button className="btn btn-neutral" onClick={handleSaveTable}>
                 บันทึก
               </button>
             </div>

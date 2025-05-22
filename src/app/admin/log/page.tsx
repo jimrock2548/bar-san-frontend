@@ -66,24 +66,7 @@ const generateMockLogs = () => {
       label: "ดู",
       severity: "info",
     },
-    {
-      type: "lock",
-      icon: <LockIcon className="h-4 w-4" />,
-      label: "ล็อค",
-      severity: "warning",
-    },
-    {
-      type: "unlock",
-      icon: <UnlockIcon className="h-4 w-4" />,
-      label: "ปลดล็อค",
-      severity: "success",
-    },
-    {
-      type: "settings",
-      icon: <SettingsIcon className="h-4 w-4" />,
-      label: "ตั้งค่า",
-      severity: "info",
-    },
+    
   ];
 
   const targets = [
@@ -145,15 +128,6 @@ const generateMockLogs = () => {
         break;
       case "view":
         details = `ดูรายละเอียด${target.label} (ID: ${targetId})`;
-        break;
-      case "lock":
-        details = `ล็อค${target.label} (ID: ${targetId})`;
-        break;
-      case "unlock":
-        details = `ปลดล็อค${target.label} (ID: ${targetId})`;
-        break;
-      case "settings":
-        details = `เปลี่ยนการตั้งค่า${target.label}`;
         break;
     }
 

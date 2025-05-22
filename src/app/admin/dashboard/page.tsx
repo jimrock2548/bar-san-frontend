@@ -45,11 +45,11 @@ export default function Page() {
 
   const allReservations = selectedCafe === "cafe-1"
     ? [
-      { id: "1", name: "คุณเอ", date: "2025-05-09", time: "18:00", status: "confirmed", zone: "Zone A" },
-      { id: "2", name: "คุณบี", date: "2025-05-09", time: "19:30", status: "pending", zone: "Zone B" },
+      { id: "1", bar: "NOIR",name: "คุณเอ", date: "2025-05-09", time: "18:00", status: "confirmed", zone: "Zone A" },
+      { id: "2", bar: "BarSan", name: "คุณบี", date: "2025-05-09", time: "19:30", status: "pending", zone: "Zone B" },
     ]
     : [
-      { id: "3", name: "คุณดี", date: "2025-05-09", time: "17:00", status: "confirmed", zone: "Zone C" },
+      { id: "3", bar: "NOIR",name: "คุณดี", date: "2025-05-09", time: "17:00", status: "confirmed", zone: "Zone C" },
     ]
 
   const filteredReservations = allReservations.filter((r) => {
@@ -217,6 +217,7 @@ export default function Page() {
   <ReservationDetailModal
     reservation={{
       id: viewingReservation,
+      bar: allReservations.find(r => r.id === viewingReservation)?.bar || "",
       reservationNumber: "RSV" + viewingReservation.padStart(4, '0'),
       date: allReservations.find(r => r.id === viewingReservation)?.date || "",
       time: allReservations.find(r => r.id === viewingReservation)?.time || "",

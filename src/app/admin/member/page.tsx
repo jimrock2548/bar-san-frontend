@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Pencil, RefreshCcw, Trash2, Search } from 'lucide-react'
+import { Pencil, RefreshCcw, Trash2, Search,Plus } from 'lucide-react'
 import Status from '@/app/components/status'
 
 type User = {
@@ -51,7 +51,9 @@ const AdminUsersPage = () => {
     <div className="p-4">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-3xl font-bold">Manage member</h1>
-        <button className="btn btn-primary">Add User</button>
+        <button className="btn btn-neutral">
+          <Plus className="w-4 h-4 mr-2 " />
+          Add User</button>
       </div>
 
       {/* Search Bar */}

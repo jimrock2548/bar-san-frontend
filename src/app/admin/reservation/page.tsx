@@ -182,14 +182,7 @@ export default function AdminReservationPage() {
                   </div>
                 </td>
 
-                <td>
-                  <button
-                    className="btn btn-sm btn-outline text-blue-600"
-                    onClick={() => handleOpenDetailModal(booking.id)}
-                  >
-                    Detail
-                  </button>
-                </td>
+            
                 <td>
                   <button
                     onClick={() => handleDelete(reservation.id)}

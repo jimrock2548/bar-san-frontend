@@ -234,20 +234,20 @@ export default function RolesPage() {
     <div className="p-6">
     <div className="flex justify-between items-center mb-6">
       <div>
-        <h1 className="text-3xl font-bold">จัดการบทบาท (Roles)</h1>
+        <h1 className="text-3xl font-bold">Manage Role</h1>
         <p className="text-gray-500 mt-1">
-          สร้างและกำหนดสิทธิ์การเข้าถึงสำหรับบทบาทต่างๆ ในระบบ
+          Create and set access rights for different roles in the system.
         </p>
       </div>
       <button
-        className="btn btn-primary"
+        className="btn btn-neutral"
         onClick={() => {
           setIsCreatingRole(true)
           setSelectedRoleId(null)
         }}
       >
         <Plus size={16} />
-        สร้างบทบาทใหม่
+        Create New Role
       </button>
     </div>
 
@@ -255,8 +255,8 @@ export default function RolesPage() {
       {/* Sidebar */}
       <div className="col-span-12 md:col-span-4 lg:col-span-3 card bg-base-100 shadow">
         <div className="card-body ">
-          <h2 className="card-title">บทบาททั้งหมด</h2>
-          <div className="overflow-y-scroll h-[calc(200vh-300px)] space-y-2 mt-4 overflow-hidden">
+          <h2 className="card-title">All Roles</h2>
+          <div className="overflow-y-scroll h-[calc(150vh-400px)] space-y-2 mt-4 overflow-hidden">
             {roles
               .sort((a, b) => a.position - b.position)
               .map((role) => (
@@ -306,27 +306,27 @@ export default function RolesPage() {
 
       {/* Main Content */}
       <div className="col-span-12 md:col-span-8 lg:col-span-9">
-        <div className="card bg-base-100 shadow h-full">
+        <div className="card bg-base-100 shadow h-fit">
           <div className="card-body">
             {isCreatingRole ? (
               <>
-                <h2 className="card-title">สร้างบทบาทใหม่</h2>
+                <h2 className="card-title">Create New Role</h2>
                 <div className="form-control w-full max-w-md flex flex-col">
                   <label className="label mb-4">
-                    <span className="label-text">ชื่อบทบาท</span>
+                    <span className="label-text">Role Name</span>
                   </label>
                   <input
                     type="text"
                     value={newRoleName}
                     onChange={(e) => setNewRoleName(e.target.value)}
                     className="input input-bordered"
-                    placeholder="เช่น Manager, Staff"
+                    placeholder="e.g. Manager, Staff"
                   />
                 </div>
 
                 <div className="form-control w-full max-w-md mt-4">
                   <label className="label">
-                    <span className="label-text">สีของบทบาท</span>
+                    <span className="label-text">Role Color</span>
                   </label>
                   <div className="flex items-center gap-4">
                     <div
@@ -341,7 +341,7 @@ export default function RolesPage() {
                     />
                     <div className="dropdown">
                       <label tabIndex={0} className="btn btn-sm btn-outline">
-                        สีที่แนะนำ <ChevronDown size={14} className="ml-1" />
+                        Recommended Colors <ChevronDown size={14} className="ml-1" />
                       </label>
                       <ul
                         tabIndex={0}
@@ -366,14 +366,14 @@ export default function RolesPage() {
 
                 <div className="mt-6 flex gap-2">
                   <button
-                    className="btn btn-primary"
+                    className="btn btn-neutral"
                     onClick={handleCreateRole}
                     disabled={!newRoleName.trim()}
                   >
-                    สร้างบทบาท
+                    Create Role
                   </button>
                   <button className="btn btn-ghost" onClick={() => setIsCreatingRole(false)}>
-                    ยกเลิก
+                    Cancel
                   </button>
                 </div>
               </>
@@ -393,7 +393,7 @@ export default function RolesPage() {
                       />
                     </div>
                     <p className="text-gray-500">
-                      ตำแหน่ง: {selectedRole.position} • สมาชิก: {selectedRole.memberCount} คน
+                      Position: {selectedRole.position} • Members: {selectedRole.memberCount}
                     </p>
                   </div>
 
@@ -442,7 +442,7 @@ export default function RolesPage() {
               </>
             ) : (
               <div className="flex justify-center mt-15 h-full text-gray-500">
-                กรุณาเลือกบทบาทเพื่อดูรายละเอียด
+                Please select a role to view details.
               </div>
             )}
           </div>
