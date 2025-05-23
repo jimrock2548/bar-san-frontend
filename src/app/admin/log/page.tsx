@@ -4,7 +4,6 @@ import '@/app/globals.css';
 import { useState, useEffect } from "react";
 import { DayPicker } from 'react-day-picker'
 import {
-  DownloadIcon,
   FilterIcon,
   SearchIcon,
   CalendarIcon,
@@ -13,59 +12,45 @@ import {
   CheckCircleIcon,
   InfoIcon,
   XCircleIcon,
-  UserIcon,
-  SettingsIcon,
   TrashIcon,
   EditIcon,
   PlusIcon,
-  EyeIcon,
-  LockIcon,
-  UnlockIcon,
   LogInIcon,
   LogOutIcon,
 } from "lucide-react";
 import { format } from "date-fns";
 import { th } from "date-fns/locale";
+import Activity from '@/app/components/activityBadge';
 
 // Mock data for activity logs (same as before)
 const generateMockLogs = () => {
   const actions = [
     {
       type: "login",
-      icon: <LogInIcon className="h-4 w-4" />,
-      label: "เข้าสู่ระบบ",
       severity: "info",
+      label: "Login",
     },
     {
       type: "logout",
-      icon: <LogOutIcon className="h-4 w-4" />,
-      label: "ออกจากระบบ",
       severity: "info",
+      label: "Logout",
     },
     {
       type: "create",
-      icon: <PlusIcon className="h-4 w-4" />,
-      label: "สร้าง",
       severity: "success",
+      label: "Create",
     },
     {
-      type: "update",
-      icon: <EditIcon className="h-4 w-4" />,
-      label: "แก้ไข",
+      type: "edit",
       severity: "warning",
+      label: "Edit",
     },
     {
       type: "delete",
-      icon: <TrashIcon className="h-4 w-4" />,
-      label: "ลบ",
       severity: "danger",
+      label: "Delete",
     },
-    {
-      type: "view",
-      icon: <EyeIcon className="h-4 w-4" />,
-      label: "ดู",
-      severity: "info",
-    },
+
     
   ];
 
@@ -120,15 +105,13 @@ const generateMockLogs = () => {
       case "create":
         details = `สร้าง${target.label}ใหม่ (ID: ${targetId})`;
         break;
-      case "update":
+      case "edit":
         details = `แก้ไข${target.label} (ID: ${targetId})`;
         break;
       case "delete":
         details = `ลบ${target.label} (ID: ${targetId})`;
         break;
-      case "view":
-        details = `ดูรายละเอียด${target.label} (ID: ${targetId})`;
-        break;
+      default:
     }
 
     logs.push({
@@ -147,7 +130,7 @@ const generateMockLogs = () => {
   // Sort logs by timestamp (newest first)
   return logs.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
 };
-const ActivityLogPage = () => {
+const ActivityLogPage = ( ) => {
   const [logs, setLogs] = useState([]);
   const [filteredLogs, setFilteredLogs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -561,8 +544,7 @@ const ActivityLogPage = () => {
                             log.action.severity
                           )}`}
                         >
-                          {log.action.icon}
-                          {log.action.label}
+                          <Activity activityString={log.action.label} />
                         </span>
                       </td>
                       <td>

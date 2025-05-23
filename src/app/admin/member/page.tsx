@@ -1,59 +1,125 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { Pencil, RefreshCcw, Trash2, Search,Plus } from 'lucide-react'
-import Status from '@/app/components/status'
+import { useState } from "react";
+import { Pencil, RefreshCcw, Trash2, Search, Plus } from "lucide-react";
+import Status from "@/app/components/status";
+import UserModal from "@/app/components/userModal";
 
 type User = {
-  id: string
-  name: string
-  email: string
-  role: string
-  bar: string
-}
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  bar: string;
+};
 
 const AdminUsersPage = () => {
   const [users, setUsers] = useState<User[]>([
-    { id: '1', name: 'Alice', email: 'alice@example.com', role: 'admin', bar: 'NOIR' },
-    { id: '2', name: 'Bob', email: 'bob@example.com', role: 'staff', bar: 'BarSan' },
-    { id: '3', name: 'Charlie', email: 'charlie@example.com', role: 'viewer', bar: 'NOIR' },
-  ])
+    {
+      id: "1",
+      name: "Alice",
+      email: "alice@example.com",
+      role: "admin",
+      bar: "NOIR",
+    },
+    {
+      id: "2",
+      name: "Bob",
+      email: "bob@example.com",
+      role: "staff",
+      bar: "BarSan",
+    },
+    {
+      id: "3",
+      name: "Charlie",
+      email: "charlie@example.com",
+      role: "viewer",
+      bar: "NOIR",
+    },
+  ]);
 
-  const [searchQuery, setSearchQuery] = useState('')
-  const [selectedUser, setSelectedUser] = useState<User | null>(null)
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
+  const handleAddSubmit = (data: {
+    fullName: string;
+    email: string;
+    role: string;
+    bar: string;
+  }) => {
+    const newUser: User = {
+      id: Date.now().toString(), // ใช้ timestamp สร้าง id ชั่วคราว
+      name: data.fullName,
+      email: data.email,
+      role: data.role,
+      bar: data.bar,
+    };
+
+    setUsers((prev) => [...prev, newUser]);
+    setIsAddModalOpen(false);
+  };
   const handleEdit = (user: User) => {
-    console.log('Edit user', user)
-  }
+    setSelectedUser(user);
+    setIsEditModalOpen(true);
+  };
 
   const handleResetPassword = (user: User) => {
-    console.log('Reset password for', user)
-  }
+    console.log("Reset password for", user);
+  };
 
   const handleDelete = (user: User) => {
-    setSelectedUser(user)
-    setIsDeleteModalOpen(true)
-  }
+    setSelectedUser(user);
+    setIsDeleteModalOpen(true);
+  };
 
   const confirmDelete = () => {
     if (selectedUser) {
-      setUsers(users.filter((u) => u.id !== selectedUser.id))
-      setIsDeleteModalOpen(false)
+      setUsers(users.filter((u) => u.id !== selectedUser.id));
+      setIsDeleteModalOpen(false);
     }
-  }
+  };
+
+  const handleEditSubmit = (data: {
+    fullName: string;
+    email: string;
+    role: string;
+    bar: string;
+  }) => {
+    if (!selectedUser) return;
+
+    const updatedUser: User = {
+      ...selectedUser,
+      name: data.fullName,
+      email: data.email,
+      role: data.role,
+      bar: data.bar,
+    };
+
+    setUsers((prev) =>
+      prev.map((u) => (u.id === selectedUser.id ? updatedUser : u))
+    );
+    setIsEditModalOpen(false);
+    setSelectedUser(null);
+  };
 
   const filteredUsers = users.filter((user) =>
     user.name.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+  );
 
   return (
     <div className="p-4">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-3xl font-bold">Manage member</h1>
-        <button className="btn btn-neutral">
+        <button
+          className="btn btn-neutral"
+          onClick={() => setIsAddModalOpen(true)}
+        >
           <Plus className="w-4 h-4 mr-2 " />
-          Add User</button>
+          Add User
+        </button>
       </div>
 
       {/* Search Bar */}
@@ -93,7 +159,9 @@ const AdminUsersPage = () => {
                   <td>{user.name}</td>
                   <td>{user.email}</td>
                   <td>{user.role}</td>
-                  <td><Status statusString={user.bar} /></td>
+                  <td>
+                    <Status statusString={user.bar} />
+                  </td>
                   <td className="flex justify-end gap-2">
                     <button
                       className="btn btn-sm btn-outline"
@@ -122,7 +190,7 @@ const AdminUsersPage = () => {
         </table>
       </div>
 
-      {/* Delete confirmation modal */}
+      {/* Delete Modal */}
       <input
         type="checkbox"
         id="delete-user-modal"
@@ -134,7 +202,7 @@ const AdminUsersPage = () => {
         <div className="modal-box">
           <h3 className="font-bold text-lg">Delete User</h3>
           <p className="py-4">
-            Are you sure you want to delete{' '}
+            Are you sure you want to delete{" "}
             <span className="font-semibold">{selectedUser?.name}</span>?
           </p>
           <div className="modal-action">
@@ -155,8 +223,37 @@ const AdminUsersPage = () => {
           </div>
         </div>
       </div>
+      {isAddModalOpen && (
+  <UserModal
+    mode="add"  // เปลี่ยนจาก "create" เป็น "add"
+    isOpen={isAddModalOpen}  // เพิ่ม prop นี้
+    initialData={{
+      fullName: "",
+      email: "",
+      role: "staff",
+      bar: "NOIR",
+    }}
+    onSubmit={handleAddSubmit}
+    onClose={() => setIsAddModalOpen(false)}
+  />
+)}
+      {/* Edit Modal */}
+      {isEditModalOpen && selectedUser && (
+        <UserModal
+          mode="edit"
+          initialData={{
+            fullName: selectedUser.name,
+            email: selectedUser.email,
+            role: selectedUser.role,
+            bar: selectedUser.bar,
+          }}
+          isOpen={isEditModalOpen}
+          onSubmit={handleEditSubmit}
+          onClose={() => setIsEditModalOpen(false)}
+        />
+      )}
     </div>
-  )
-}
+  );
+};
 
-export default AdminUsersPage
+export default AdminUsersPage;

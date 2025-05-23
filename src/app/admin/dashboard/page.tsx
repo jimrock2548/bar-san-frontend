@@ -71,7 +71,7 @@ export default function Page() {
     <div className="p-4 md:p-6 lg:p-8">
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-3xl font-bold">Dashboard</h1>
+          <h1 className="text-3xl font-semibold">Dashboard</h1>
           <p className="text-base text-gray-500">
             Overview of {currentCafeName} - {format(new Date(), "d MMMM yyyy", { locale: th })}
           </p>
