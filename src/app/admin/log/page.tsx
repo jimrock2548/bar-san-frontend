@@ -1,10 +1,10 @@
 "use client";
-import '@/app/globals.css';
+import "@/app/globals.css";
 
 import { useState, useEffect } from "react";
-import { DayPicker } from 'react-day-picker'
+import { DayPicker } from "react-day-picker";
 import {
-  FilterIcon,
+   FilterIcon,
   SearchIcon,
   CalendarIcon,
   RefreshCwIcon,
@@ -12,15 +12,33 @@ import {
   CheckCircleIcon,
   InfoIcon,
   XCircleIcon,
-  TrashIcon,
-  EditIcon,
-  PlusIcon,
-  LogInIcon,
-  LogOutIcon,
+  XIcon,
 } from "lucide-react";
 import { format } from "date-fns";
 import { th } from "date-fns/locale";
-import Activity from '@/app/components/activityBadge';
+import Activity from "@/app/components/activityBadge";
+
+type Log = {
+  id: string;
+  timestamp: Date;
+  admin: {
+    id: number;
+    name: string;
+    role: string;
+    cafe: string;
+  };
+  action: {
+    type: string;
+    severity: string;
+    label: string;
+  };
+  target: {
+    type: string;
+    label: string;
+  };
+  details: string;
+  ipAddress: string;
+};
 
 // Mock data for activity logs (same as before)
 const generateMockLogs = () => {
@@ -50,8 +68,6 @@ const generateMockLogs = () => {
       severity: "danger",
       label: "Delete",
     },
-
-    
   ];
 
   const targets = [
@@ -130,7 +146,7 @@ const generateMockLogs = () => {
   // Sort logs by timestamp (newest first)
   return logs.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
 };
-const ActivityLogPage = ( ) => {
+const ActivityLogPage = () => {
   const [logs, setLogs] = useState([]);
   const [filteredLogs, setFilteredLogs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -144,8 +160,17 @@ const ActivityLogPage = ( ) => {
     to: undefined,
   });
   const [activeTab, setActiveTab] = useState("all");
+  const [selectedLog, setSelectedLog] = useState<Log | null>(null);
 
   const logsPerPage = 10;
+
+  const openLogDetails = (log: Log) => {
+    setSelectedLog(log);
+  };
+
+  const closeLogDetails = () => {
+    setSelectedLog(null);
+  };
 
   // Simulate fetching logs from an API
   useEffect(() => {
@@ -298,11 +323,11 @@ const ActivityLogPage = ( ) => {
   return (
     <div className="container mx-auto py-6 space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">บันทึกกิจกรรมของผู้ดูแลระบบ</h1>
+        <h1 className="text-3xl font-bold">Administrator activity log</h1>
         <div className="flex gap-2">
           <button className="btn btn-outline" onClick={resetFilters}>
             <RefreshCwIcon className="h-4 w-4 mr-2" />
-            รีเซ็ตตัวกรอง
+            Reset filter
           </button>
           {/*<button className="btn btn-outline" onClick={exportLogs}>
             <DownloadIcon className="h-4 w-4 mr-2" />
@@ -313,20 +338,22 @@ const ActivityLogPage = ( ) => {
 
       <div className="card bg-base-100 shadow">
         <div className="card-body">
-          <h2 className="card-title">ตัวกรองข้อมูล</h2>
-          <p className="text-gray-500">กรองบันทึกกิจกรรมตามเงื่อนไขต่างๆ</p>
+          <h2 className="card-title">Data filter</h2>
+          <p className="text-gray-500">
+            Filter activity logs by various conditions
+          </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="form-control">
               <label className="label">
-                <span className="label-text">ค้นหา</span>
+                <span className="label-text">search</span>
               </label>
               <label className="input input-bordered flex items-center gap-2">
                 <SearchIcon className="h-4 w-4" />
                 <input
                   type="text"
                   className="grow"
-                  placeholder="ค้นหาตามชื่อ, รายละเอียด, IP"
+                  placeholder="Search by name, details, IP"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
@@ -335,14 +362,14 @@ const ActivityLogPage = ( ) => {
 
             <div className="form-control">
               <label className="label">
-                <span className="label-text">ประเภทการกระทำ</span>
+                <span className="label-text">Action type</span>
               </label>
               <select
                 className="select select-bordered w-full"
                 value={actionFilter}
                 onChange={(e) => setActionFilter(e.target.value)}
               >
-                <option value="">ทั้งหมด</option>
+                <option value="">All</option>
                 {uniqueActions.map((action) => (
                   <option key={action.type} value={action.type}>
                     {action.label}
@@ -353,14 +380,14 @@ const ActivityLogPage = ( ) => {
 
             <div className="form-control">
               <label className="label">
-                <span className="label-text">ผู้ดูแลระบบ</span>
+                <span className="label-text">Administrator</span>
               </label>
               <select
                 className="select select-bordered w-full"
                 value={adminFilter}
                 onChange={(e) => setAdminFilter(e.target.value)}
               >
-                <option value="">ทั้งหมด</option>
+                <option value="">All</option>
                 {uniqueAdmins.map((admin) => (
                   <option key={admin.id} value={admin.id}>
                     {admin.name} ({admin.role})
@@ -371,14 +398,14 @@ const ActivityLogPage = ( ) => {
 
             <div className="form-control">
               <label className="label">
-                <span className="label-text">ร้าน</span>
+                <span className="label-text">Store</span>
               </label>
               <select
                 className="select select-bordered w-full"
                 value={cafeFilter}
                 onChange={(e) => setCafeFilter(e.target.value)}
               >
-                <option value="">ทั้งหมด</option>
+                <option value="">All</option>
                 {uniqueCafes.map((cafe) => (
                   <option key={cafe} value={cafe}>
                     {cafe}
@@ -389,7 +416,7 @@ const ActivityLogPage = ( ) => {
 
             <div className="form-control md:col-span-2">
               <label className="label">
-                <span className="label-text">ช่วงวันที่</span>
+                <span className="label-text">Date range</span>
               </label>
 
               <div className="flex items-center gap-2">
@@ -409,7 +436,7 @@ const ActivityLogPage = ( ) => {
                       format(dateRange.from, "d MMM yyyy", { locale: th })
                     )
                   ) : (
-                    <span>เลือกช่วงวันที่</span>
+                    <span>Select date range</span>
                   )}
                 </button>
 
@@ -420,7 +447,7 @@ const ActivityLogPage = ( ) => {
                       setDateRange({ from: undefined, to: undefined })
                     }
                   >
-                    รีเซ็ต
+                    Reset
                   </button>
                 )}
               </div>
@@ -440,7 +467,7 @@ const ActivityLogPage = ( ) => {
                   footer={
                     dateRange.from && dateRange.to ? (
                       <p className="text-sm text-gray-400 px-2">
-                        เลือกแล้ว:{" "}
+                        Selected:{" "}
                         {format(dateRange.from, "d MMM yyyy", { locale: th })} -{" "}
                         {format(dateRange.to, "d MMM yyyy", { locale: th })}
                       </p>
@@ -455,9 +482,9 @@ const ActivityLogPage = ( ) => {
 
       <div className="card bg-base-100 shadow">
         <div className="card-body">
-          <h2 className="card-title">บันทึกกิจกรรม</h2>
+          <h2 className="card-title">Activity log</h2>
           <p className="text-gray-500">
-            พบ {filteredLogs.length} รายการ จากทั้งหมด {logs.length} รายการ
+            Found {filteredLogs.length} items out of {logs.length} items
           </p>
 
           <div className="tabs tabs-boxed">
@@ -466,35 +493,35 @@ const ActivityLogPage = ( ) => {
               onClick={() => setActiveTab("all")}
             >
               <FilterIcon className="h-4 w-4 mr-2" />
-              ทั้งหมด
+              All
             </a>
             <a
               className={`tab ${activeTab === "danger" ? "tab-active" : ""}`}
               onClick={() => setActiveTab("danger")}
             >
               <XCircleIcon className="h-4 w-4 mr-2" />
-              สำคัญมาก
+              Critical
             </a>
             <a
               className={`tab ${activeTab === "warning" ? "tab-active" : ""}`}
               onClick={() => setActiveTab("warning")}
             >
               <AlertCircleIcon className="h-4 w-4 mr-2" />
-              คำเตือน
+              Warning
             </a>
             <a
               className={`tab ${activeTab === "success" ? "tab-active" : ""}`}
               onClick={() => setActiveTab("success")}
             >
               <CheckCircleIcon className="h-4 w-4 mr-2" />
-              สำเร็จ
+              Success
             </a>
             <a
               className={`tab ${activeTab === "info" ? "tab-active" : ""}`}
               onClick={() => setActiveTab("info")}
             >
               <InfoIcon className="h-4 w-4 mr-2" />
-              ข้อมูล
+              Information
             </a>
           </div>
 
@@ -506,23 +533,27 @@ const ActivityLogPage = ( ) => {
             ) : currentLogs.length === 0 ? (
               <div className="text-center py-10">
                 <p className="text-gray-500">
-                  ไม่พบข้อมูลที่ตรงกับเงื่อนไขการค้นหา
+                  No results found matching your search criteria
                 </p>
               </div>
             ) : (
               <table className="table">
                 <thead>
                   <tr>
-                    <th>วันที่และเวลา</th>
-                    <th>ผู้ดูแลระบบ</th>
-                    <th>การกระทำ</th>
-                    <th>รายละเอียด</th>
+                    <th>Date and time</th>
+                    <th>Administrator</th>
+                    <th>Action</th>
+                    <th>Details</th>
                     <th>IP Address</th>
                   </tr>
                 </thead>
                 <tbody>
                   {currentLogs.map((log) => (
-                    <tr key={log.id} className="hover">
+                    <tr
+                      key={log.id}
+                      className="hover cursor-pointer"
+                      onClick={() => openLogDetails(log)}
+                    >
                       <td>
                         <div className="text-sm">
                           {formatDate(log.timestamp)}
@@ -562,9 +593,9 @@ const ActivityLogPage = ( ) => {
 
           <div className="flex justify-between items-center">
             <div className="text-sm text-gray-500">
-              แสดง {indexOfFirstLog + 1}-
-              {Math.min(indexOfLastLog, filteredLogs.length)} จาก{" "}
-              {filteredLogs.length} รายการ
+              Showing {indexOfFirstLog + 1}-
+              {Math.min(indexOfLastLog, filteredLogs.length)} of{" "}
+              {filteredLogs.length} items
             </div>
 
             <div className="join">
@@ -624,6 +655,70 @@ const ActivityLogPage = ( ) => {
           </div>
         </div>
       </div>
+      {selectedLog && (
+        <div className="modal modal-open">
+          <div className="modal-box max-w-2xl">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-bold">Log Details</h3>
+              <button
+                className="btn btn-sm btn-circle"
+                onClick={closeLogDetails}
+              >
+                <XIcon className="h-4 w-4" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-gray-500">Timestamp</p>
+                  <p>{formatDate(selectedLog.timestamp)}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">IP Address</p>
+                  <p className="font-mono">{selectedLog.ipAddress}</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-gray-500">Administrator</p>
+                  <p>{selectedLog.admin.name}</p>
+                  <p className="text-sm text-gray-500">
+                    {selectedLog.admin.role} • {selectedLog.admin.cafe}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Action</p>
+                  <span
+                    className={`badge gap-1 ${getBadgeVariant(
+                      selectedLog.action.severity
+                    )}`}
+                  >
+                    <Activity activityString={selectedLog.action.label} />
+                  </span>
+                </div>
+              </div>
+
+              <div>
+                <p className="text-sm text-gray-500">Target</p>
+                <p>{selectedLog.target.label}</p>
+              </div>
+
+              <div>
+                <p className="text-sm text-gray-500">Details</p>
+                <p className="whitespace-pre-wrap">{selectedLog.details}</p>
+              </div>
+            </div>
+
+            <div className="modal-action">
+              <button className="btn" onClick={closeLogDetails}>
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

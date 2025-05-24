@@ -22,7 +22,7 @@ function Activity({ activityString }: activityProps) {
       colorClass = 'badge-info'
         textClass = ' badge-outline' 
       break
-    case 'logout':
+    case 'logout':  
       colorClass = 'badge-neutral'
       textClass = ' badge-outline' 
       break
