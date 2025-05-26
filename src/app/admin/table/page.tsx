@@ -1,104 +1,119 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useState } from "react"
 import { Edit, Plus } from "lucide-react"
+import { mockTables, mockCafes, getTablesByBar, type Table } from "@/app/lib/mockData"
 
 export default function AdminTablesPage() {
-  const router = useRouter()
-  const [user, setUser] = useState<any>(null)
-  const [selectedCafe, setSelectedCafe] = useState<string | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [tables, setTables] = useState<any[]>([])
+  const [selectedCafe, setSelectedCafe] = useState<string>("BarSan")
+  const [tables, setTables] = useState<Table[]>(mockTables)
   const [editingTable, setEditingTable] = useState<any>(null)
-
   const [isDialogOpen, setIsDialogOpen] = useState(false)
 
-  /*useEffect(() => {
-    const adminUser = localStorage.getItem("adminUser")
-    if (!adminUser) {
-      router.push("/admin/login")
-      return
-    }
-
-    const userData = JSON.parse(adminUser)
-    setUser(userData)
-
-    if (userData.role === "admin") {
-      setSelectedCafe(userData.cafeId)
-    } else if (userData.role === "superadmin" && userData.cafes?.length > 0) {
-      setSelectedCafe(userData.cafes[0].id)
-    }
-
-    setIsLoading(false)
-  }, [router])*/
-
-  useEffect(() => {
-    if (selectedCafe) {
-      const mockTables = [
-        { id: 1, number: 1, seats: 2, location: "ริมหน้าต่าง", status: "available", isActive: true },
-        { id: 2, number: 2, seats: 2, location: "ริมหน้าต่าง", status: "available", isActive: true },
-        { id: 3, number: 3, seats: 2, location: "ริมหน้าต่าง", status: "booked", isActive: true },
-        { id: 4, number: 4, seats: 4, location: "กลางร้าน", status: "available", isActive: true },
-        { id: 5, number: 5, seats: 4, location: "กลางร้าน", status: "booked", isActive: true },
-        { id: 6, number: 6, seats: 4, location: "มุมร้าน", status: "available", isActive: true },
-        { id: 7, number: 7, seats: 4, location: "มุมร้าน", status: "booked", isActive: true },
-        { id: 8, number: 8, seats: 6, location: "โซนส่วนตัว", status: "available", isActive: true },
-        { id: 9, number: 9, seats: 6, location: "โซนส่วนตัว", status: "available", isActive: true },
-      ]
-      setTables(mockTables)
-    }
-  }, [selectedCafe])
+  // Get tables for selected cafe
+  const cafeTables = getTablesByBar(selectedCafe)
+  const cafeDisplayName = mockCafes.find((c) => c.name === selectedCafe)?.displayName || selectedCafe
 
   const handleAddTable = () => {
-    setEditingTable({ id: null, number: tables.length + 1, seats: 2, location: "", status: "available", isActive: true })
+    const existingNumbers = cafeTables.map((t) => t.number)
+    const nextNumber = Math.max(...existingNumbers, 0) + 1
+
+    setEditingTable({
+      id: null,
+      number: nextNumber,
+      seats: 2,
+      location: "ริมหน้าต่าง",
+      zone: "Zone A",
+      status: "available",
+      isActive: true,
+      bar: selectedCafe,
+    })
     setIsDialogOpen(true)
   }
 
-  const handleEditTable = (table) => {
+  const handleEditTable = (table: Table) => {
     setEditingTable({ ...table })
     setIsDialogOpen(true)
   }
 
   const handleSaveTable = () => {
     if (editingTable.id) {
+      // Update existing table
       setTables(tables.map((t) => (t.id === editingTable.id ? editingTable : t)))
     } else {
-      setTables([...tables, { ...editingTable, id: Math.max(...tables.map((t) => t.id)) + 1 }])
+      // Add new table
+      const newId = `${selectedCafe.toLowerCase().substring(0, 2)}-t${Date.now()}`
+      setTables([...tables, { ...editingTable, id: newId }])
     }
     setIsDialogOpen(false)
     setEditingTable(null)
   }
 
-  const handleToggleTableStatus = (tableId) => {
+  const handleToggleTableStatus = (tableId: string) => {
     setTables(tables.map((t) => (t.id === tableId ? { ...t, isActive: !t.isActive } : t)))
   }
 
-  /*if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <span className="loading loading-spinner loading-lg"></span>
-      </div>
-    )
-  }*/
+  const handleDeleteTable = (tableId: string) => {
+    if (confirm("Are you sure you want to delete this table?")) {
+      setTables(tables.filter((t) => t.id !== tableId))
+    }
+  }
 
-  //if (!user) return null
+  const zones = [...new Set(cafeTables.map((table) => table.zone))]
+  const locations = ["ริมหน้าต่าง", "กลางร้าน", "มุมร้าน", "โซนส่วนตัว", "Bar Counter", "Couple Table", "Large Group"]
 
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-3xl font-bold">Manage Table</h1>
-          <p className="text-gray-500">Manage All Talble</p>
+          <h1 className="text-3xl font-bold">Manage Tables</h1>
+          <p className="text-gray-500">Manage tables for {cafeDisplayName}</p>
         </div>
-        <button className="btn btn-neutral" onClick={handleAddTable}>
-          <Plus className="w-4 h-4 mr-2 " />
-          Add a new table
-        </button>
+        <div className="flex gap-4">
+          {/* Cafe Selector */}
+          <select
+            className="select select-bordered"
+            value={selectedCafe}
+            onChange={(e) => setSelectedCafe(e.target.value)}
+          >
+            {mockCafes.map((cafe) => (
+              <option key={cafe.id} value={cafe.name}>
+                {cafe.displayName}
+              </option>
+            ))}
+          </select>
+          <button className="btn btn-neutral" onClick={handleAddTable}>
+            <Plus className="w-4 h-4 mr-2" />
+            Add Table
+          </button>
+        </div>
       </div>
 
+      {/* Statistics */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div className="stat bg-base-100 shadow rounded-lg">
+          <div className="stat-title">Total Tables</div>
+          <div className="stat-value text-primary">{cafeTables.length}</div>
+        </div>
+        <div className="stat bg-base-100 shadow rounded-lg">
+          <div className="stat-title">Available</div>
+          <div className="stat-value text-success">
+            {cafeTables.filter((t) => t.status === "available" && t.isActive).length}
+          </div>
+        </div>
+        <div className="stat bg-base-100 shadow rounded-lg">
+          <div className="stat-title">Booked</div>
+          <div className="stat-value text-warning">{cafeTables.filter((t) => t.status === "booked").length}</div>
+        </div>
+        <div className="stat bg-base-100 shadow rounded-lg">
+          <div className="stat-title">Inactive</div>
+          <div className="stat-value text-error">{cafeTables.filter((t) => !t.isActive).length}</div>
+        </div>
+      </div>
+
+      {/* Tables Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {tables.map((table) => (
+        {cafeTables.map((table) => (
           <div key={table.id} className={`card bg-base-100 shadow ${!table.isActive && "opacity-60"}`}>
             <div className="card-body">
               <div className="flex justify-between items-start">
@@ -109,71 +124,145 @@ export default function AdminTablesPage() {
                     className="toggle toggle-sm"
                     checked={table.isActive}
                     onChange={() => handleToggleTableStatus(table.id)}
+                    title={table.isActive ? "Deactivate table" : "Activate table"}
                   />
-                  <button className="btn btn-ghost btn-xs" onClick={() => handleEditTable(table)}>
+                  <button className="btn btn-ghost btn-xs" onClick={() => handleEditTable(table)} title="Edit table">
                     <Edit className="h-4 w-4" />
                   </button>
                 </div>
               </div>
-              <p className="text-sm text-gray-500">{table.location || "ไม่ระบุตำแหน่ง"}</p>
+
+              <div className="space-y-2">
+                <p className="text-sm text-gray-500">
+                  <span className="font-medium">Location:</span> {table.location}
+                </p>
+                <p className="text-sm text-gray-500">
+                  <span className="font-medium">Zone:</span> {table.zone}
+                </p>
+              </div>
+
               <div className="flex justify-between mt-4">
                 <div>
-                  <p className="text-sm text-gray-500">ที่นั่ง</p>
-                  <p>{table.seats} ที่นั่ง</p>
+                  <p className="text-sm text-gray-500">Seats</p>
+                  <p className="font-medium">{table.seats} ที่นั่ง</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">สถานะ</p>
-                  <span className={`badge ${table.status === "available" ? "badge-success" : "badge-error"}`}>
-                    {table.status === "available" ? "ว่าง" : "ไม่ว่าง"}
+                  <p className="text-sm text-gray-500">Status</p>
+                  <span
+                    className={`badge ${
+                      table.status === "available"
+                        ? "badge-success"
+                        : table.status === "booked"
+                          ? "badge-warning"
+                          : "badge-error"
+                    }`}
+                  >
+                    {table.status === "available" ? "Available" : table.status === "booked" ? "Booked" : "Maintenance"}
                   </span>
                 </div>
               </div>
+
+              {!table.isActive && (
+                <div className="mt-2">
+                  <button
+                    className="btn btn-sm btn-error btn-outline w-full"
+                    onClick={() => handleDeleteTable(table.id)}
+                  >
+                    Delete Table
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         ))}
       </div>
 
+      {/* Add/Edit Table Modal */}
       {isDialogOpen && editingTable && (
         <dialog className="modal modal-open">
           <div className="modal-box">
-            <h3 className="font-bold text-lg">{editingTable.id ? "แก้ไขโต๊ะ" : "เพิ่มโต๊ะใหม่"}</h3>
+            <h3 className="font-bold text-lg">{editingTable.id ? "Edit Table" : "Add New Table"}</h3>
             <div className="py-4 space-y-4">
-              <input
-                type="number"
-                placeholder="หมายเลขโต๊ะ"
-                className="input input-bordered w-full"
-                value={editingTable.number}
-                onChange={(e) => setEditingTable({ ...editingTable, number: parseInt(e.target.value) })}
-              />
-              <select
-                className="select select-bordered w-full"
-                value={editingTable.seats}
-                onChange={(e) => setEditingTable({ ...editingTable, seats: parseInt(e.target.value) })}
-              >
-                {[2, 4, 6, 8].map((v) => (
-                  <option key={v} value={v}>
-                    {v} ที่นั่ง
-                  </option>
-                ))}
-              </select>
-              <select
-                className="select select-bordered w-full"
-                value={editingTable.location}
-                onChange={(e) => setEditingTable({ ...editingTable, location: e.target.value })}
-              >
-                <option value="ริมหน้าต่าง">ริมหน้าต่าง</option>
-                <option value="กลางร้าน">กลางร้าน</option>
-                <option value="มุมร้าน">มุมร้าน</option>
-                <option value="โซนส่วนตัว">โซนส่วนตัว</option>
-              </select>
-              <select
-                className="select select-bordered w-full"
-                value={editingTable.status}
-                onChange={(e) => setEditingTable({ ...editingTable, status: e.target.value })}
-              >
-                <option value="available">ว่าง</option>
-                <option value="booked">ไม่ว่าง</option>
-              </select>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="label">
+                    <span className="label-text">Table Number</span>
+                  </label>
+                  <input
+                    type="number"
+                    className="input input-bordered w-full"
+                    value={editingTable.number}
+                    onChange={(e) => setEditingTable({ ...editingTable, number: Number.parseInt(e.target.value) })}
+                  />
+                </div>
+                <div>
+                  <label className="label">
+                    <span className="label-text">Seats</span>
+                  </label>
+                  <select
+                    className="select select-bordered w-full"
+                    value={editingTable.seats}
+                    onChange={(e) => setEditingTable({ ...editingTable, seats: Number.parseInt(e.target.value) })}
+                  >
+                    {[2, 4, 6, 8, 10].map((v) => (
+                      <option key={v} value={v}>
+                        {v} ที่นั่ง
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="label">
+                  <span className="label-text">Zone</span>
+                </label>
+                <select
+                  className="select select-bordered w-full"
+                  value={editingTable.zone}
+                  onChange={(e) => setEditingTable({ ...editingTable, zone: e.target.value })}
+                >
+                  {zones.map((zone) => (
+                    <option key={zone} value={zone}>
+                      {zone}
+                    </option>
+                  ))}
+                  <option value="Zone D">Zone D (New)</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="label">
+                  <span className="label-text">Location</span>
+                </label>
+                <select
+                  className="select select-bordered w-full"
+                  value={editingTable.location}
+                  onChange={(e) => setEditingTable({ ...editingTable, location: e.target.value })}
+                >
+                  {locations.map((location) => (
+                    <option key={location} value={location}>
+                      {location}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="label">
+                  <span className="label-text">Status</span>
+                </label>
+                <select
+                  className="select select-bordered w-full"
+                  value={editingTable.status}
+                  onChange={(e) => setEditingTable({ ...editingTable, status: e.target.value })}
+                >
+                  <option value="available">Available</option>
+                  <option value="booked">Booked</option>
+                  <option value="maintenance">Maintenance</option>
+                </select>
+              </div>
+
               <div className="flex items-center gap-2">
                 <input
                   type="checkbox"
@@ -181,15 +270,15 @@ export default function AdminTablesPage() {
                   checked={editingTable.isActive}
                   onChange={(e) => setEditingTable({ ...editingTable, isActive: e.target.checked })}
                 />
-                <span>เปิดใช้งาน</span>
+                <span>Active</span>
               </div>
             </div>
             <div className="modal-action">
               <button className="btn btn-outline" onClick={() => setIsDialogOpen(false)}>
-                ยกเลิก
+                Cancel
               </button>
               <button className="btn btn-neutral" onClick={handleSaveTable}>
-                บันทึก
+                {editingTable.id ? "Update" : "Create"}
               </button>
             </div>
           </div>

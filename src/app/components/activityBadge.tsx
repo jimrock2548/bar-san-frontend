@@ -32,7 +32,7 @@ function Activity({ activityString }: activityProps) {
   }
 
   return (
-    <span className={`badge ${colorClass} ${textClass} capitalize`}>
+    <span className={`badge ${colorClass} ${textClass} capitalize w-20`}>
       {activityString}
     </span>
   )
