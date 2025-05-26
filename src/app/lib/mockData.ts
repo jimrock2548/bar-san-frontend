@@ -60,9 +60,23 @@ export interface ActivityLog {
   target: {
     type: string
     label: string
+    id?: string
   }
   details: string
   ipAddress: string
+  userAgent?: string
+  sessionId?: string
+  changes?: {
+    before: Record<string, any>
+    after: Record<string, any>
+    fields: string[]
+  }
+  metadata?: {
+    duration?: number
+    affectedRecords?: number
+    errorCode?: string
+    requestId?: string
+  }
 }
 
 export interface Role {
@@ -535,10 +549,16 @@ export const generateMockLogs = (): ActivityLog[] => {
     { id: 5, name: "ประสิทธิ์ ทำงานดี", role: "Viewer", cafe: "BarSan" },
   ]
 
+  const userAgents = [
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+    "Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1",
+  ]
+
   const logs: ActivityLog[] = []
   const now = new Date()
 
-  // Generate 100 random logs
+  // Generate 100 random logs with detailed information
   for (let i = 0; i < 100; i++) {
     const action = actions[Math.floor(Math.random() * actions.length)]
     const target = targets[Math.floor(Math.random() * targets.length)]
@@ -549,25 +569,128 @@ export const generateMockLogs = (): ActivityLog[] => {
     date.setDate(date.getDate() - Math.floor(Math.random() * 30))
     date.setHours(Math.floor(Math.random() * 24), Math.floor(Math.random() * 60), Math.floor(Math.random() * 60))
 
-    // Generate a descriptive message based on the action and target
-    let details = ""
     const targetId = Math.floor(Math.random() * 1000) + 1
+    let details = ""
+    let changes = undefined
+    let metadata = undefined
 
     switch (action.type) {
       case "login":
-        details = `เข้าสู่ระบบ`
+        details = `เข้าสู่ระบบสำเร็จ`
+        metadata = {
+          duration: Math.floor(Math.random() * 5000) + 1000, // 1-6 seconds
+          requestId: `req_${Date.now()}_${i}`,
+        }
         break
       case "logout":
         details = `ออกจากระบบ`
+        metadata = {
+          duration: Math.floor(Math.random() * 2000) + 500, // 0.5-2.5 seconds
+          requestId: `req_${Date.now()}_${i}`,
+        }
         break
       case "create":
         details = `สร้าง${target.label}ใหม่ (ID: ${targetId})`
+        if (target.type === "user") {
+          changes = {
+            before: {},
+            after: {
+              name: "ผู้ใช้ใหม่",
+              email: `user${targetId}@example.com`,
+              role: "staff",
+              status: "active",
+            },
+            fields: ["name", "email", "role", "status"],
+          }
+        } else if (target.type === "reservation") {
+          changes = {
+            before: {},
+            after: {
+              customerName: "ลูกค้าใหม่",
+              date: "2025-05-15",
+              time: "19:00",
+              guests: 4,
+              status: "pending",
+            },
+            fields: ["customerName", "date", "time", "guests", "status"],
+          }
+        }
+        metadata = {
+          duration: Math.floor(Math.random() * 3000) + 500,
+          requestId: `req_${Date.now()}_${i}`,
+        }
         break
       case "edit":
         details = `แก้ไข${target.label} (ID: ${targetId})`
+        if (target.type === "user") {
+          changes = {
+            before: {
+              name: "ชื่อเดิม",
+              email: "old@example.com",
+              role: "staff",
+              status: "active",
+            },
+            after: {
+              name: "ชื่อใหม่",
+              email: "new@example.com",
+              role: "admin",
+              status: "active",
+            },
+            fields: ["name", "email", "role"],
+          }
+        } else if (target.type === "reservation") {
+          changes = {
+            before: {
+              status: "pending",
+              table: null,
+              time: "18:00",
+            },
+            after: {
+              status: "confirmed",
+              table: "T5",
+              time: "19:00",
+            },
+            fields: ["status", "table", "time"],
+          }
+        } else if (target.type === "table") {
+          changes = {
+            before: {
+              status: "available",
+              seats: 4,
+              location: "กลางร้าน",
+            },
+            after: {
+              status: "maintenance",
+              seats: 6,
+              location: "มุมร้าน",
+            },
+            fields: ["status", "seats", "location"],
+          }
+        }
+        metadata = {
+          duration: Math.floor(Math.random() * 4000) + 1000,
+          requestId: `req_${Date.now()}_${i}`,
+        }
         break
       case "delete":
         details = `ลบ${target.label} (ID: ${targetId})`
+        if (target.type === "user") {
+          changes = {
+            before: {
+              name: "ผู้ใช้ที่ถูกลบ",
+              email: `deleted${targetId}@example.com`,
+              role: "staff",
+              status: "active",
+            },
+            after: {},
+            fields: ["name", "email", "role", "status"],
+          }
+        }
+        metadata = {
+          duration: Math.floor(Math.random() * 2000) + 500,
+          affectedRecords: 1,
+          requestId: `req_${Date.now()}_${i}`,
+        }
         break
       default:
     }
@@ -577,9 +700,16 @@ export const generateMockLogs = (): ActivityLog[] => {
       timestamp: date,
       admin: admin,
       action: action,
-      target: target,
+      target: {
+        ...target,
+        id: targetId.toString(),
+      },
       details: details,
       ipAddress: `192.168.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`,
+      userAgent: userAgents[Math.floor(Math.random() * userAgents.length)],
+      sessionId: `sess_${Date.now()}_${admin.id}_${Math.floor(Math.random() * 1000)}`,
+      changes,
+      metadata,
     })
   }
 

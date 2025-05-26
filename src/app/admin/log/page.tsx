@@ -13,12 +13,12 @@ import {
   CheckCircleIcon,
   InfoIcon,
   XCircleIcon,
-  XIcon,
 } from "lucide-react"
 import { format } from "date-fns"
 import { th } from "date-fns/locale"
 import Activity from "@/app/components/activityBadge"
 import { generateMockLogs, type ActivityLog } from "@/app/lib/mockData"
+import LogDetailModal from "@/app/components/logDetailModal"
 
 const ActivityLogPage = () => {
   const [logs, setLogs] = useState<ActivityLog[]>([])
@@ -382,7 +382,7 @@ const ActivityLogPage = () => {
                         </div>
                       </td>
                       <td>
-                        <span className={`badge gap-1`}>
+                        <span className={`badge gap-1 `}>
                           <Activity activityString={log.action.label} />
                         </span>
                       </td>
@@ -459,63 +459,7 @@ const ActivityLogPage = () => {
       </div>
 
       {/* Log Details Modal */}
-      {selectedLog && (
-        <div className="modal modal-open">
-          <div className="modal-box max-w-2xl">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-bold">Log Details</h3>
-              <button className="btn btn-sm btn-circle" onClick={closeLogDetails}>
-                <XIcon className="h-4 w-4" />
-              </button>
-            </div>
-
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm text-gray-500">Timestamp</p>
-                  <p>{formatDate(selectedLog.timestamp)}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500">IP Address</p>
-                  <p className="font-mono">{selectedLog.ipAddress}</p>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm text-gray-500">Administrator</p>
-                  <p>{selectedLog.admin.name}</p>
-                  <p className="text-sm text-gray-500">
-                    {selectedLog.admin.role} • {selectedLog.admin.cafe}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500">Action</p>
-                  <span className={`badge gap-1 ${getBadgeVariant(selectedLog.action.severity)}`}>
-                    <Activity activityString={selectedLog.action.label} />
-                  </span>
-                </div>
-              </div>
-
-              <div>
-                <p className="text-sm text-gray-500">Target</p>
-                <p>{selectedLog.target.label}</p>
-              </div>
-
-              <div>
-                <p className="text-sm text-gray-500">Details</p>
-                <p className="whitespace-pre-wrap">{selectedLog.details}</p>
-              </div>
-            </div>
-
-            <div className="modal-action">
-              <button className="btn" onClick={closeLogDetails}>
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {selectedLog && <LogDetailModal log={selectedLog} onClose={closeLogDetails} />}
     </div>
   )
 }

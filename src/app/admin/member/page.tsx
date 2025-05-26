@@ -135,8 +135,8 @@ const AdminUsersPage = () => {
                 <tr key={user.id}>
                   <td>{user.name}</td>
                   <td>{user.email}</td>
-                  <td>
-                    <span className="badge badge-outline capitalize">{user.role}</span>
+                  <td className="capitalize">
+                   {user.role}
                   </td>
                   <td>
                     <Status statusString={user.bar} />
