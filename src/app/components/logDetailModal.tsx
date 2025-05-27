@@ -1,9 +1,22 @@
 "use client"
 
-import { X, Clock, User, Globe, Smartphone, ArrowRight, AlertCircle, CheckCircle, Info, XCircle } from "lucide-react"
+import {
+  X,
+  Clock,
+  User,
+  Globe,
+  Smartphone,
+  ArrowRight,
+  AlertCircle,
+  CheckCircle,
+  Info,
+  XCircle,
+  Shield,
+} from "lucide-react"
 import { format } from "date-fns"
 import { th } from "date-fns/locale"
 import Activity from "./activityBadge"
+import PermissionChanges from "./permissionChanges"
 import type { ActivityLog } from "@/app/lib/mockData"
 
 interface LogDetailModalProps {
@@ -65,7 +78,7 @@ export default function LogDetailModal({ log, onClose }: LogDetailModalProps) {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 backdrop-blur-sm bg-black/50">
-      <div className="bg-white rounded-lg w-full max-w-4xl mx-4 shadow-xl max-h-[90vh] overflow-y-auto">
+      <div className="bg-white rounded-lg w-full max-w-5xl mx-4 shadow-xl max-h-[90vh] overflow-y-auto">
         <div className="sticky top-0 bg-white border-b p-6 flex justify-between items-center">
           <div className="flex items-center gap-3">
             {getSeverityIcon(log.action.severity)}
@@ -148,6 +161,7 @@ export default function LogDetailModal({ log, onClose }: LogDetailModalProps) {
                   <div className="flex items-center gap-2 mb-2">
                     <Activity activityString={log.action.label} />
                     <span className="font-medium">{log.target.label}</span>
+                    {log.target.name && <span className="text-gray-600">({log.target.name})</span>}
                   </div>
                   <p className="text-sm text-gray-600">รายละเอียด</p>
                   <p className="font-medium">{log.details}</p>
@@ -162,12 +176,23 @@ export default function LogDetailModal({ log, onClose }: LogDetailModalProps) {
             </div>
           </div>
 
+          {/* Permission Changes Section */}
+          {log.permissionChanges && log.permissionChanges.length > 0 && (
+            <div>
+              <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                <Shield className="h-5 w-5" />
+                การเปลี่ยนแปลงสิทธิ์
+              </h3>
+              <PermissionChanges changes={log.permissionChanges} />
+            </div>
+          )}
+
           {/* Changes Section */}
           {log.changes && (
             <div>
               <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
                 <ArrowRight className="h-5 w-5" />
-                การเปลี่ยนแปลงข้อมูล
+                การเปลี่ยนแปลงข้อมูลทั่วไป
               </h3>
               <div className="bg-gray-50 p-4 rounded-lg">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

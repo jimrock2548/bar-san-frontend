@@ -1,18 +1,20 @@
-'use client'
-import React, { useState } from 'react'
-import { useRouter } from 'next/navigation'
+"use client"
+import type React from "react"
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import { authenticateAdmin } from "@/app/lib/mockData"
 
 export default function Page() {
   const [isGoogleLoading, setIsGoogleLoading] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const [email,setEmail] = useState("")
+  const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
 
-  const [name,setName] = useState("")
-  const [phone,setPhone] = useState("")
-  const [regisEmail,setRegisEmail] = useState("")
-  const [regisPassword,setRegisPassword] = useState("")
-  const [regisConfirmPassword,setRegisConfirmPassword] = useState("")
+  const [name, setName] = useState("")
+  const [phone, setPhone] = useState("")
+  const [regisEmail, setRegisEmail] = useState("")
+  const [regisPassword, setRegisPassword] = useState("")
+  const [regisConfirmPassword, setRegisConfirmPassword] = useState("")
 
   const router = useRouter()
 
@@ -28,7 +30,7 @@ export default function Page() {
           email: "example@google.test",
           phone: "123456789",
           isLoggedIn: true,
-        })
+        }),
       )
       setIsGoogleLoading(false)
       router.push("../")
@@ -38,6 +40,33 @@ export default function Page() {
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
+
+    // Check if it's an admin login first
+    const adminAccount = authenticateAdmin(email, password)
+
+    if (adminAccount) {
+      // Admin login successful
+      localStorage.setItem(
+        "adminUser",
+        JSON.stringify({
+          id: adminAccount.id,
+          name: adminAccount.name,
+          email: adminAccount.email,
+          role: adminAccount.role,
+          cafes: adminAccount.cafes.map((cafeName) => ({
+            id: cafeName === "BarSan" ? "cafe-1" : "cafe-2",
+            name: cafeName,
+            displayName: cafeName === "BarSan" ? "BarSan." : "NOIR",
+          })),
+          isLoggedIn: true,
+        }),
+      )
+      setIsLoading(false)
+      router.push("/admin/dashboard")
+      return
+    }
+
+    // Regular user login (existing logic)
     console.log("Logging in with", email, password)
     setTimeout(() => {
       localStorage.setItem(
@@ -45,10 +74,10 @@ export default function Page() {
         JSON.stringify({
           id: "2",
           name: "TestNameEmail",
-          email: "email",
+          email: email,
           phone: "987654321",
           isLoggedIn: true,
-        })
+        }),
       )
       setIsLoading(false)
       router.push("../")
@@ -58,13 +87,14 @@ export default function Page() {
   const handleRegister = (e: React.FormEvent) => {
     e.preventDefault()
     localStorage.setItem(
-     " users",JSON.stringify({
-        id:"3",
+      " users",
+      JSON.stringify({
+        id: "3",
         name,
         email,
         phone,
         isLoggedin: true,
-      })
+      }),
     )
     router.push("../")
   }
@@ -78,7 +108,7 @@ export default function Page() {
         email: "",
         phone: "",
         isLoggedIn: false,
-      })
+      }),
     )
     router.push("../")
   }
@@ -133,115 +163,153 @@ export default function Page() {
 
           <div className="flex items-center mb-3">
             <hr className="flex-grow border-t border-gray-300" />
-            <span className="mx-3 text-xs text-gray-500 whitespace-nowrap">
-              Or sign in with email
-            </span>
+            <span className="mx-3 text-xs text-gray-500 whitespace-nowrap">Or sign in with email</span>
             <hr className="flex-grow border-t border-gray-300" />
           </div>
 
           {/* name of each tab group should be unique */}
           <div className="tabs tabs-box">
             <input type="radio" name="my_tabs_1" className="tab w-1/2" aria-label="Login" defaultChecked />
-            <div className="tab-content" >
+            <div className="tab-content">
               <form onSubmit={handleLogin}>
-              <fieldset className="fieldset">
-                <legend className="fieldset-legend" >Email</legend>
-                <input 
-                type="email" 
-                className="input w-full" 
-                placeholder="example@example.com" 
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                />
-              </fieldset>
-              <fieldset className="fieldset">
-                <legend className="fieldset-legend ">Password</legend>
-                <input type="password" 
-                className="input w-full" 
-                placeholder="Type your password here" 
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                />
-              </fieldset>
-              <div className='my-6' />
-              <button className='btn btn-neutral w-full' type='submit'>Login</button>
+                <fieldset className="fieldset">
+                  <legend className="fieldset-legend">Email</legend>
+                  <input
+                    type="input"
+                    className="input w-full"
+                    placeholder="example@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
+                </fieldset>
+                <fieldset className="fieldset">
+                  <legend className="fieldset-legend ">Password</legend>
+                  <input
+                    type="password"
+                    className="input w-full"
+                    placeholder="Type your password here"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+                </fieldset>
+                <div className="my-6" />
+                <button className="btn btn-neutral w-full" type="submit">
+                  Login
+                </button>
               </form>
             </div>
             <input type="radio" name="my_tabs_1" className="tab w-1/2" aria-label="Register" />
             <div className="tab-content">
-            <form onSubmit={handleRegister}>
-            <fieldset className="fieldset">
-                <legend className="fieldset-legend">Name</legend>
-                <input 
-                type="text"
-                className="input w-full"
-                placeholder="Type your name here" 
-                value={name}
-                onChange={(e)=> setName(e.target.value)}
-                required
-                />
-              </fieldset>
-              <fieldset className="fieldset">
-                <legend className="fieldset-legend">Phone number</legend>
-                <input 
-                type="text" 
-                className="input w-full" 
-                placeholder="Type your phone number here" 
-                value={phone}
-                onChange={(e)=> setPhone(e.target.value)}
-                required
-                />
-              </fieldset>
-              <fieldset className="fieldset">
-                <legend className="fieldset-legend">Email</legend>
-                <input 
-                type="email" 
-                className="input w-full"
-                placeholder="Type your email here" 
-                value={regisEmail}
-                onChange={(e)=> setRegisEmail(e.target.value)}
-                required
-                />
-              </fieldset>
-              <fieldset className="fieldset">
-                <legend className="fieldset-legend ">Password</legend>
-                <input 
-                type="password" 
-                className="input w-full" 
-                placeholder="password"
-                value={regisPassword}
-                onChange={(e)=> setRegisPassword(e.target.value)}
-                required
-                />
-              </fieldset>
-              <fieldset className="fieldset">
-                <legend className="fieldset-legend ">Confirm password</legend>
-                <input 
-                type="password" 
-                className="input w-full" 
-                placeholder="Confirm password"
-                value={regisConfirmPassword}
-                onChange={(e)=> setRegisConfirmPassword(e.target.value)}
-                required
-                />
-              </fieldset>
-              <div className='my-6' />
-              <button className='btn btn-neutral w-full' type='submit'>Register</button>
-            </form>
+              <form onSubmit={handleRegister}>
+                <fieldset className="fieldset">
+                  <legend className="fieldset-legend">Name</legend>
+                  <input
+                    type="text"
+                    className="input w-full"
+                    placeholder="Type your name here"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    required
+                  />
+                </fieldset>
+                <fieldset className="fieldset">
+                  <legend className="fieldset-legend">Phone number</legend>
+                  <input
+                    type="text"
+                    className="input w-full"
+                    placeholder="Type your phone number here"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    required
+                  />
+                </fieldset>
+                <fieldset className="fieldset">
+                  <legend className="fieldset-legend">Email</legend>
+                  <input
+                    type="email"
+                    className="input w-full"
+                    placeholder="Type your email here"
+                    value={regisEmail}
+                    onChange={(e) => setRegisEmail(e.target.value)}
+                    required
+                  />
+                </fieldset>
+                <fieldset className="fieldset">
+                  <legend className="fieldset-legend ">Password</legend>
+                  <input
+                    type="password"
+                    className="input w-full"
+                    placeholder="password"
+                    value={regisPassword}
+                    onChange={(e) => setRegisPassword(e.target.value)}
+                    required
+                  />
+                </fieldset>
+                <fieldset className="fieldset">
+                  <legend className="fieldset-legend ">Confirm password</legend>
+                  <input
+                    type="password"
+                    className="input w-full"
+                    placeholder="Confirm password"
+                    value={regisConfirmPassword}
+                    onChange={(e) => setRegisConfirmPassword(e.target.value)}
+                    required
+                  />
+                </fieldset>
+                <div className="my-6" />
+                <button className="btn btn-neutral w-full" type="submit">
+                  Register
+                </button>
+              </form>
             </div>
           </div>
         </div>
 
         <div className="text-center">
           <p className="mb-4 text-[#8a7356]">หรือ</p>
-          <button
-            className="w-full btn btn-outline"
-            onClick={handleGuestContinue}
-          >
+          <button className="w-full btn btn-outline" onClick={handleGuestContinue}>
             ดำเนินการต่อในฐานะผู้ใช้ทั่วไป
           </button>
+        </div>
+
+        {/* Test Admin Accounts */}
+        <div className="mt-8 bg-gray-50 rounded-lg p-4">
+          <h3 className="text-lg font-semibold mb-3 text-gray-700">🧪 Test Admin Accounts</h3>
+          <div className="space-y-2 text-sm">
+            <div className="grid grid-cols-3 gap-2 font-medium text-gray-600 border-b pb-2">
+              <span>Username</span>
+              <span>Password</span>
+              <span>Role</span>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              <span className="font-mono">superadmin</span>
+              <span className="font-mono">123456</span>
+              <span className="text-purple-600">Super Admin</span>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              <span className="font-mono">admin.barsan</span>
+              <span className="font-mono">123456</span>
+              <span className="text-blue-600">Admin (BarSan)</span>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              <span className="font-mono">admin.noir</span>
+              <span className="font-mono">123456</span>
+              <span className="text-blue-600">Admin (NOIR)</span>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              <span className="font-mono">staff.barsan</span>
+              <span className="font-mono">123456</span>
+              <span className="text-green-600">Staff</span>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              <span className="font-mono">viewer.test</span>
+              <span className="font-mono">123456</span>
+              <span className="text-yellow-600">Viewer</span>
+            </div>
+          </div>
+          <p className="text-xs text-gray-500 mt-3">💡 ใช้ username และ password ข้างต้นเพื่อทดสอบระบบ Admin</p>
         </div>
       </div>
     </main>

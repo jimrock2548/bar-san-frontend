@@ -43,6 +43,15 @@ export interface Cafe {
   displayName: string
 }
 
+export interface PermissionChange {
+  permission: string
+  group: string
+  type: "added" | "removed" | "modified"
+  before?: boolean
+  after?: boolean
+  description: string
+}
+
 export interface ActivityLog {
   id: string
   timestamp: Date
@@ -61,6 +70,7 @@ export interface ActivityLog {
     type: string
     label: string
     id?: string
+    name?: string
   }
   details: string
   ipAddress: string
@@ -71,6 +81,7 @@ export interface ActivityLog {
     after: Record<string, any>
     fields: string[]
   }
+  permissionChanges?: PermissionChange[]
   metadata?: {
     duration?: number
     affectedRecords?: number
@@ -521,6 +532,46 @@ export const getAvailableTablesCount = (bar: string): number => {
   return mockTables.filter((table) => table.bar === bar && table.status === "available" && table.isActive).length
 }
 
+// Permission descriptions mapping
+const permissionDescriptions: Record<string, Record<string, string>> = {
+  dashboard: {
+    viewDashboard: "ดูข้อมูลหน้า Dashboard",
+    assignTable: "กำหนดโต๊ะให้ลูกค้า",
+    manageSettings: "จัดการการตั้งค่าระบบ",
+  },
+  reservation: {
+    viewReservation: "ดูข้อมูลการจอง",
+    updateStatus: "อัพเดทสถานะการจอง",
+    reservationDelete: "ลบข้อมูลการจอง",
+  },
+  table: {
+    viewTable: "ดูข้อมูลโต๊ะ",
+    addTable: "เพิ่มโต๊ะใหม่",
+    editTable: "แก้ไขข้อมูลโต๊ะ",
+  },
+  member: {
+    viewMember: "ดูข้อมูล Admin ในร้าน",
+    editMember: "แก้ไขข้อมูล Admin",
+    addRoleToMember: "กำหนดบทบาทให้สมาชิก",
+    addNewAdminAccount: "สร้างบัญชี Admin ใหม่",
+  },
+  role: {
+    roleManage: "จัดการบทบาทและสิทธิ์",
+  },
+  log: {
+    viewReport: "ดูรายงานและ Log ระบบ",
+  },
+}
+
+const groupNames: Record<string, string> = {
+  dashboard: "Dashboard",
+  reservation: "จัดการการจอง",
+  table: "จัดการโต๊ะ",
+  member: "จัดการสมาชิก",
+  role: "จัดการบทบาท",
+  log: "รายงานระบบ",
+}
+
 // Generate Activity Logs
 export const generateMockLogs = (): ActivityLog[] => {
   const actions = [
@@ -572,6 +623,7 @@ export const generateMockLogs = (): ActivityLog[] => {
     const targetId = Math.floor(Math.random() * 1000) + 1
     let details = ""
     let changes = undefined
+    let permissionChanges = undefined
     let metadata = undefined
 
     switch (action.type) {
@@ -614,6 +666,42 @@ export const generateMockLogs = (): ActivityLog[] => {
             },
             fields: ["customerName", "date", "time", "guests", "status"],
           }
+        } else if (target.type === "role") {
+          const roleName = `บทบาทใหม่ ${targetId}`
+          details = `สร้างบทบาทใหม่ "${roleName}"`
+          changes = {
+            before: {},
+            after: {
+              name: roleName,
+              color: "#3366FF",
+              position: 5,
+            },
+            fields: ["name", "color", "position"],
+          }
+          // สร้าง permission changes สำหรับ role ใหม่
+          permissionChanges = [
+            {
+              permission: "viewDashboard",
+              group: "dashboard",
+              type: "added" as const,
+              after: true,
+              description: permissionDescriptions.dashboard.viewDashboard,
+            },
+            {
+              permission: "viewReservation",
+              group: "reservation",
+              type: "added" as const,
+              after: true,
+              description: permissionDescriptions.reservation.viewReservation,
+            },
+            {
+              permission: "viewTable",
+              group: "table",
+              type: "added" as const,
+              after: true,
+              description: permissionDescriptions.table.viewTable,
+            },
+          ]
         }
         metadata = {
           duration: Math.floor(Math.random() * 3000) + 500,
@@ -623,17 +711,19 @@ export const generateMockLogs = (): ActivityLog[] => {
       case "edit":
         details = `แก้ไข${target.label} (ID: ${targetId})`
         if (target.type === "user") {
+          const oldRole = ["staff", "admin", "viewer"][Math.floor(Math.random() * 3)]
+          const newRole = ["staff", "admin", "viewer"][Math.floor(Math.random() * 3)]
           changes = {
             before: {
               name: "ชื่อเดิม",
               email: "old@example.com",
-              role: "staff",
+              role: oldRole,
               status: "active",
             },
             after: {
               name: "ชื่อใหม่",
               email: "new@example.com",
-              role: "admin",
+              role: newRole,
               status: "active",
             },
             fields: ["name", "email", "role"],
@@ -666,6 +756,63 @@ export const generateMockLogs = (): ActivityLog[] => {
             },
             fields: ["status", "seats", "location"],
           }
+        } else if (target.type === "role") {
+          const roleName = `บทบาท ${targetId}`
+          details = `แก้ไขสิทธิ์บทบาท "${roleName}"`
+          changes = {
+            before: {
+              name: roleName,
+              color: "#FF5733",
+            },
+            after: {
+              name: roleName,
+              color: "#3366FF",
+            },
+            fields: ["permissions"],
+          }
+          // สร้าง permission changes แบบละเอียด
+          permissionChanges = [
+            {
+              permission: "manageSettings",
+              group: "dashboard",
+              type: "added" as const,
+              before: false,
+              after: true,
+              description: permissionDescriptions.dashboard.manageSettings,
+            },
+            {
+              permission: "reservationDelete",
+              group: "reservation",
+              type: "removed" as const,
+              before: true,
+              after: false,
+              description: permissionDescriptions.reservation.reservationDelete,
+            },
+            {
+              permission: "editTable",
+              group: "table",
+              type: "modified" as const,
+              before: false,
+              after: true,
+              description: permissionDescriptions.table.editTable,
+            },
+            {
+              permission: "addNewAdminAccount",
+              group: "member",
+              type: "added" as const,
+              before: false,
+              after: true,
+              description: permissionDescriptions.member.addNewAdminAccount,
+            },
+            {
+              permission: "viewReport",
+              group: "log",
+              type: "removed" as const,
+              before: true,
+              after: false,
+              description: permissionDescriptions.log.viewReport,
+            },
+          ]
         }
         metadata = {
           duration: Math.floor(Math.random() * 4000) + 1000,
@@ -685,6 +832,42 @@ export const generateMockLogs = (): ActivityLog[] => {
             after: {},
             fields: ["name", "email", "role", "status"],
           }
+        } else if (target.type === "role") {
+          const roleName = `บทบาทที่ถู��ลบ ${targetId}`
+          details = `ลบบทบาท "${roleName}"`
+          changes = {
+            before: {
+              name: roleName,
+              color: "#FF5733",
+              memberCount: 3,
+            },
+            after: {},
+            fields: ["name", "color", "permissions"],
+          }
+          // สร้าง permission changes สำหรับการลบ role
+          permissionChanges = [
+            {
+              permission: "viewDashboard",
+              group: "dashboard",
+              type: "removed" as const,
+              before: true,
+              description: permissionDescriptions.dashboard.viewDashboard,
+            },
+            {
+              permission: "viewReservation",
+              group: "reservation",
+              type: "removed" as const,
+              before: true,
+              description: permissionDescriptions.reservation.viewReservation,
+            },
+            {
+              permission: "editTable",
+              group: "table",
+              type: "removed" as const,
+              before: true,
+              description: permissionDescriptions.table.editTable,
+            },
+          ]
         }
         metadata = {
           duration: Math.floor(Math.random() * 2000) + 500,
@@ -703,16 +886,93 @@ export const generateMockLogs = (): ActivityLog[] => {
       target: {
         ...target,
         id: targetId.toString(),
+        name: target.type === "role" ? `บทบาท ${targetId}` : undefined,
       },
       details: details,
       ipAddress: `192.168.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`,
       userAgent: userAgents[Math.floor(Math.random() * userAgents.length)],
       sessionId: `sess_${Date.now()}_${admin.id}_${Math.floor(Math.random() * 1000)}`,
       changes,
+      permissionChanges,
       metadata,
     })
   }
 
   // Sort logs by timestamp (newest first)
   return logs.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
+}
+
+export { permissionDescriptions, groupNames }
+
+// Admin accounts for testing
+export interface AdminAccount {
+  id: string
+  username: string
+  password: string
+  name: string
+  email: string
+  role: "superadmin" | "admin" | "staff" | "viewer"
+  cafes: string[]
+  isActive: boolean
+}
+
+export const mockAdminAccounts: AdminAccount[] = [
+  {
+    id: "admin-1",
+    username: "superadmin",
+    password: "123456",
+    name: "Super Admin",
+    email: "superadmin@barsan.com",
+    role: "superadmin",
+    cafes: ["BarSan", "NOIR"],
+    isActive: true,
+  },
+  {
+    id: "admin-2",
+    username: "admin.barsan",
+    password: "123456",
+    name: "Admin BarSan",
+    email: "admin@barsan.com",
+    role: "admin",
+    cafes: ["BarSan"],
+    isActive: true,
+  },
+  {
+    id: "admin-3",
+    username: "admin.noir",
+    password: "123456",
+    name: "Admin NOIR",
+    email: "admin@noir.com",
+    role: "admin",
+    cafes: ["NOIR"],
+    isActive: true,
+  },
+  {
+    id: "admin-4",
+    username: "staff.barsan",
+    password: "123456",
+    name: "Staff BarSan",
+    email: "staff@barsan.com",
+    role: "staff",
+    cafes: ["BarSan"],
+    isActive: true,
+  },
+  {
+    id: "admin-5",
+    username: "viewer.test",
+    password: "123456",
+    name: "Viewer Test",
+    email: "viewer@test.com",
+    role: "viewer",
+    cafes: ["BarSan"],
+    isActive: true,
+  },
+]
+
+// Helper function to authenticate admin
+export const authenticateAdmin = (username: string, password: string): AdminAccount | null => {
+  const admin = mockAdminAccounts.find(
+    (account) => account.username === username && account.password === password && account.isActive,
+  )
+  return admin || null
 }

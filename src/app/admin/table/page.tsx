@@ -2,17 +2,20 @@
 
 import { useState } from "react"
 import { Edit, Plus } from "lucide-react"
-import { mockTables, mockCafes, getTablesByBar, type Table } from "@/app/lib/mockData"
+import { useAdmin } from "@/app/admin/layout"
+import { mockCafes, getTablesByBar, type Table } from "@/app/lib/mockData"
 
 export default function AdminTablesPage() {
-  const [selectedCafe, setSelectedCafe] = useState<string>("BarSan")
-  const [tables, setTables] = useState<Table[]>(mockTables)
+  const { selectedCafe } = useAdmin()
+  const [tables, setTables] = useState<Table[]>([])
   const [editingTable, setEditingTable] = useState<any>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
 
+  const currentCafeName = mockCafes.find((c) => c.id === selectedCafe)?.name || "BarSan"
+  const cafeDisplayName = mockCafes.find((c) => c.id === selectedCafe)?.displayName || currentCafeName
+
   // Get tables for selected cafe
-  const cafeTables = getTablesByBar(selectedCafe)
-  const cafeDisplayName = mockCafes.find((c) => c.name === selectedCafe)?.displayName || selectedCafe
+  const cafeTables = getTablesByBar(currentCafeName)
 
   const handleAddTable = () => {
     const existingNumbers = cafeTables.map((t) => t.number)
@@ -26,7 +29,7 @@ export default function AdminTablesPage() {
       zone: "Zone A",
       status: "available",
       isActive: true,
-      bar: selectedCafe,
+      bar: currentCafeName,
     })
     setIsDialogOpen(true)
   }
@@ -42,7 +45,7 @@ export default function AdminTablesPage() {
       setTables(tables.map((t) => (t.id === editingTable.id ? editingTable : t)))
     } else {
       // Add new table
-      const newId = `${selectedCafe.toLowerCase().substring(0, 2)}-t${Date.now()}`
+      const newId = `${currentCafeName.toLowerCase().substring(0, 2)}-t${Date.now()}`
       setTables([...tables, { ...editingTable, id: newId }])
     }
     setIsDialogOpen(false)
@@ -70,18 +73,6 @@ export default function AdminTablesPage() {
           <p className="text-gray-500">Manage tables for {cafeDisplayName}</p>
         </div>
         <div className="flex gap-4">
-          {/* Cafe Selector */}
-          <select
-            className="select select-bordered"
-            value={selectedCafe}
-            onChange={(e) => setSelectedCafe(e.target.value)}
-          >
-            {mockCafes.map((cafe) => (
-              <option key={cafe.id} value={cafe.name}>
-                {cafe.displayName}
-              </option>
-            ))}
-          </select>
           <button className="btn btn-neutral" onClick={handleAddTable}>
             <Plus className="w-4 h-4 mr-2" />
             Add Table

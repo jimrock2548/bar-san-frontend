@@ -2,14 +2,14 @@
 
 import type React from "react"
 
-import { useRouter } from "next/navigation"
 import { format } from "date-fns"
 import { th } from "date-fns/locale"
-import { CalendarRange, ChevronDown, Table2, Users, CalendarDays } from "lucide-react"
+import { CalendarRange, Table2, Users, CalendarDays } from "lucide-react"
 import { useState } from "react"
 import Status from "@/app/components/status"
 import { DayPicker } from "react-day-picker"
 import ReservationDetailModal from "@/app/components/reservationDetail"
+import { useAdmin } from "@/app/admin/layout"
 import {
   mockCafes,
   getReservationsByBar,
@@ -21,18 +21,11 @@ import {
 } from "@/app/lib/mockData"
 
 export default function Page() {
-  const router = useRouter()
+  const { selectedCafe } = useAdmin()
   const [date, setDate] = useState<Date>()
   const [zoneFilter, setZoneFilter] = useState<string>("")
   const [statusFilter, setStatusFilter] = useState<string>("All")
   const [viewingReservation, setViewingReservation] = useState<string | null>(null)
-
-  const user = {
-    role: "superadmin",
-    cafes: mockCafes,
-  }
-
-  const [selectedCafe, setSelectedCafe] = useState<string>(user.cafes[0].id)
   const [selectedTable, setSelectedTable] = useState<{ [key: string]: string }>({})
 
   const currentCafeName = mockCafes.find((c) => c.id === selectedCafe)?.displayName || ""
@@ -74,22 +67,6 @@ export default function Page() {
             Overview of {currentCafeName} - {format(new Date(), "d MMMM yyyy", { locale: th })}
           </p>
         </div>
-
-        {user.role === "superadmin" && (
-          <div className="dropdown dropdown-end">
-            <label tabIndex={0} className="btn btn-outline">
-              {currentCafeName} <ChevronDown className="ml-2 h-4 w-4" />
-            </label>
-            <ul tabIndex={0} className="menu dropdown-content mt-2 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
-              <li className="menu-title">เลือกร้าน</li>
-              {user.cafes.map((cafe) => (
-                <li key={cafe.id}>
-                  <a onClick={() => setSelectedCafe(cafe.id)}>{cafe.displayName}</a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
