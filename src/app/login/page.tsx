@@ -3,6 +3,7 @@ import type React from "react"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { authenticateAdmin } from "@/app/lib/mockData"
+import axios from "axios"
 
 export default function Page() {
   const [isGoogleLoading, setIsGoogleLoading] = useState(false)
@@ -36,7 +37,29 @@ export default function Page() {
       router.push("../")
     }, 2000)
   }
+    const handleAdminLogin = async (e: React.FormEvent) => {
+      e.preventDefault();
+      setIsLoading(true);
 
+      try {
+        const response = await axios.post('http://localhost:5000/auth/admin/login', {
+          username: email,
+          password: password,
+        });
+
+        if (response.data.token) {
+          localStorage.setItem('adminUser', JSON.stringify(response.data));
+          setIsLoading(false);
+          router.push('/admin/dashboard');
+        } else {
+          setIsLoading(false);
+          // Handle error
+        }
+      } catch (error) {
+        setIsLoading(false);
+        // Handle error
+      }
+  };
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
@@ -171,7 +194,7 @@ export default function Page() {
           <div className="tabs tabs-box">
             <input type="radio" name="my_tabs_1" className="tab w-1/2" aria-label="Login" defaultChecked />
             <div className="tab-content">
-              <form onSubmit={handleLogin}>
+              <form onSubmit={handleAdminLogin}>
                 <fieldset className="fieldset">
                   <legend className="fieldset-legend">Email</legend>
                   <input
