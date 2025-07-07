@@ -363,7 +363,6 @@ export const mockRoles: Role[] = [
       dashboard: {
         viewDashboard: true,
         assignTable: true,
-        manageSettings: true,
       },
       reservation: {
         viewReservation: true,
@@ -399,7 +398,6 @@ export const mockRoles: Role[] = [
       dashboard: {
         viewDashboard: true,
         assignTable: true,
-        manageSettings: false,
       },
       reservation: {
         viewReservation: true,
@@ -435,7 +433,6 @@ export const mockRoles: Role[] = [
       dashboard: {
         viewDashboard: true,
         assignTable: true,
-        manageSettings: false,
       },
       reservation: {
         viewReservation: true,
@@ -471,7 +468,6 @@ export const mockRoles: Role[] = [
       dashboard: {
         viewDashboard: true,
         assignTable: false,
-        manageSettings: false,
       },
       reservation: {
         viewReservation: true,
@@ -537,7 +533,6 @@ const permissionDescriptions: Record<string, Record<string, string>> = {
   dashboard: {
     viewDashboard: "ดูข้อมูลหน้า Dashboard",
     assignTable: "กำหนดโต๊ะให้ลูกค้า",
-    manageSettings: "จัดการการตั้งค่าระบบ",
   },
   reservation: {
     viewReservation: "ดูข้อมูลการจอง",
