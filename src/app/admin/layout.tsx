@@ -27,7 +27,7 @@ interface AdminLayoutProps {
 interface AdminContextType {
   user: any
   selectedCafe: string
-  setSelectedCafe: (cafeId: string) => void
+  setSelectedCafe: (cafeName: string) => void
 }
 
 const AdminContext = createContext<AdminContextType | null>(null)
@@ -50,12 +50,9 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     const storedUser = localStorage.getItem("adminUser")
     if (storedUser) {
       try {
-        //const userData = JSON.parse(storedUser)
-        //setUser(userData)
-        //setSelectedCafe(userData.cafes[0]?.id || "")
         const userData = JSON.parse(storedUser)
         setUser(userData.admin)
-        setSelectedCafe(userData.admin.roles[0]?.id || "")
+        setSelectedCafe(userData.admin.roles[0]?.cafe || "")
       } catch (err) {
         console.error("Error parsing admin user data:", err)
         router.push("/login")
@@ -70,8 +67,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     router.push("/login")
   }
 
-  const handleCafeChange = (cafeId: string) => {
-    setSelectedCafe(cafeId)
+  const handleCafeChange = (cafeName: string) => {
+    setSelectedCafe(cafeName)
   }
 
   if (!user) {
@@ -80,7 +77,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
   const navigation = [
     { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
-    { name: "Reseravtion ", href: "/admin/reservation", icon: CalendarRange },
+    { name: "Reservation", href: "/admin/reservation", icon: CalendarRange },
     { name: "Tables", href: "/admin/table", icon: Table2 },
     { name: "Member", href: "/admin/member", icon: UserRoundSearch },
     { name: "Role", href: "/admin/role", icon: UserCog },
@@ -120,13 +117,13 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           <div className="mt-auto p-4 border-t border-gray-800">
             <div className="mb-4">
               <p className="text-sm text-gray-400">เข้าสู่ระบบในฐานะ</p>
-              <p className="font-medium">{user?.name}</p>
+              <p className="font-medium">{user?.full_name}</p>
               <p className="text-xs text-gray-400">
-                {user?.role === "superadmin"
+                {user?.roles[0]?.role === "super_admin"
                   ? "Super Admin"
-                  : user?.role === "admin"
+                  : user?.roles[0]?.role === "admin"
                     ? "Admin"
-                    : user?.role === "staff"
+                    : user?.roles[0]?.role === "staff"
                       ? "Staff"
                       : "Viewer"}
               </p>
@@ -146,25 +143,21 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           <header className="bg-white border-b sticky top-0 z-10">
             <div className="px-6 py-4 flex justify-between items-center">
               <h1 className="text-xl font-bold">
-                {user?.role === "admin"
-                  ? user?.cafes?.find((c: any) => c.id === selectedCafe)?.displayName
-                  : user?.role === "superadmin" && selectedCafe
-                    ? user?.cafes?.find((c: any) => c.id === selectedCafe)?.displayName
-                    : "Admin Panel"}
+                {selectedCafe || "Admin Panel"}
               </h1>
 
               <div className="flex items-center gap-4">
-                {user?.role === "superadmin" && user?.cafes?.length > 1 && (
+                {user?.roles.length > 1 && (
                   <div className="dropdown dropdown-end">
                     <label tabIndex={0} className="btn btn-outline gap-2">
-                      {user?.cafes?.find((c: any) => c.id === selectedCafe)?.displayName || "Select Cafe"}
+                      {selectedCafe || "Select Cafe"}
                       <ChevronDown className="h-4 w-4" />
                     </label>
                     <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
                       <li className="menu-title">เลือกร้าน</li>
-                      {user.cafes.map((cafe: any) => (
-                        <li key={cafe.id}>
-                          <a onClick={() => handleCafeChange(cafe.id)}>{cafe.displayName}</a>
+                      {user.roles.map((role: any, index: number) => (
+                        <li key={index}>
+                          <a onClick={() => handleCafeChange(role.cafe)}>{role.cafe}</a>
                         </li>
                       ))}
                     </ul>
@@ -178,9 +171,9 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 <div className="dropdown dropdown-end">
                   <label tabIndex={0} className="btn btn-ghost flex items-center gap-2">
                     <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
-                      <span className="font-medium text-sm">{user?.name?.charAt(0)}</span>
+                      <span className="font-medium text-sm">{user?.username?.charAt(0)}</span>
                     </div>
-                    {user?.name}
+                    {user?.username}
                     <ChevronDown className="h-4 w-4" />
                   </label>
                   <ul className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52 mt-4">
