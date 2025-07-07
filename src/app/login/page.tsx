@@ -42,8 +42,8 @@ export default function Page() {
       setIsLoading(true);
 
       try {
-        const response = await axios.post('http://localhost:5000/auth/admin/login', {
-          username: email,
+        const response = await axios.post('http://myhostserver.sytes.net:5050/auth/login', {
+          email: email,
           password: password,
         });
 

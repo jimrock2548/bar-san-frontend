@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import withAuth from "@/app/lib/withauth"
 import { ChevronDown, ChevronUp, Plus, Trash2 } from "lucide-react"
 import { cn } from "@/app/lib/utils"
 import { mockRoles, type Role } from "@/app/lib/mockData"
@@ -54,7 +55,7 @@ const permissionGroups = {
   },
 }
 
-export default function RolesPage() {
+export default function withAuth(RolesPage) {
   const [roles, setRoles] = useState<Role[]>(mockRoles)
   const [selectedRoleId, setSelectedRoleId] = useState<number | null>(null)
   const [isCreatingRole, setIsCreatingRole] = useState(false)

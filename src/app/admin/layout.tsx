@@ -50,9 +50,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     const storedUser = localStorage.getItem("adminUser")
     if (storedUser) {
       try {
+        //const userData = JSON.parse(storedUser)
+        //setUser(userData)
+        //setSelectedCafe(userData.cafes[0]?.id || "")
         const userData = JSON.parse(storedUser)
-        setUser(userData)
-        setSelectedCafe(userData.cafes[0]?.id || "")
+        setUser(userData.admin)
+        setSelectedCafe(userData.admin.roles[0]?.id || "")
       } catch (err) {
         console.error("Error parsing admin user data:", err)
         router.push("/login")

@@ -2,6 +2,7 @@ import React from 'react'
 import { Check, Calendar, Clock, UserRound, MapPin } from 'lucide-react'
 import Status from '@/app/components/status'
 
+
 function Page() {
   return (
     <div className='bg-black min-h-screen text-white flex flex-col items-center'>

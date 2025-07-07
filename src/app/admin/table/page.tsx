@@ -1,11 +1,13 @@
 "use client"
 
+import withAuth from "@/app/lib/withauth"
+
 import { useState } from "react"
 import { Edit, Plus } from "lucide-react"
 import { useAdmin } from "@/app/admin/layout"
 import { mockCafes, getTablesByBar, type Table } from "@/app/lib/mockData"
 
-export default function AdminTablesPage() {
+export default function withAuth(AdminTablesPage) {
   const { selectedCafe } = useAdmin()
   const [tables, setTables] = useState<Table[]>([])
   const [editingTable, setEditingTable] = useState<any>(null)

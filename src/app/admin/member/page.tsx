@@ -1,6 +1,8 @@
 "use client"
 
 import { useState } from "react"
+import React from "react"
+import withAuth from "@/app/lib/withauth"
 import { Pencil, RefreshCcw, Trash2, Search, Plus } from "lucide-react"
 import Status from "@/app/components/status"
 import UserModal from "@/app/components/userModal"
@@ -230,4 +232,4 @@ const AdminUsersPage = () => {
   )
 }
 
-export default AdminUsersPage
+export default withAuth(AdminUsersPage)

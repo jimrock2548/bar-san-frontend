@@ -1,6 +1,7 @@
 "use client"
 
 import type React from "react"
+import withAuth from "@/app/lib/withauth"
 
 import { format } from "date-fns"
 import { th } from "date-fns/locale"
@@ -20,7 +21,8 @@ import {
   getAvailableTablesByZone,
 } from "@/app/lib/mockData"
 
-export default function Page() {
+
+export default function withAuth(Page) {
   const { selectedCafe } = useAdmin()
   const [date, setDate] = useState<Date>()
   const [zoneFilter, setZoneFilter] = useState<string>("")

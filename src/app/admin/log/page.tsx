@@ -1,6 +1,7 @@
 "use client"
 import "@/app/globals.css"
 import type React from "react"
+import withAuth from "@/app/lib/withauth"
 
 import { useState, useEffect } from "react"
 import { DayPicker } from "react-day-picker"
@@ -464,4 +465,4 @@ const ActivityLogPage = () => {
   )
 }
 
-export default ActivityLogPage
+export default withAuth(ActivityLogPage)

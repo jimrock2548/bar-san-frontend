@@ -1,6 +1,8 @@
 "use client"
 
 import type React from "react"
+import withAuth from "@/app/lib/withauth"
+
 
 import { useState } from "react"
 import { format } from "date-fns"
@@ -10,7 +12,7 @@ import Status from "@/app/components/status"
 import { useRouter } from "next/navigation"
 import { mockReservations, type Reservation } from "@/app/lib/mockData"
 
-export default function AdminReservationPage() {
+export default function withAuth(AdminReservationPage) {
   const [reservations, setReservations] = useState<Reservation[]>(mockReservations)
   const [selectedDate, setSelectedDate] = useState<Date | undefined>()
   const [filter, setFilter] = useState<"all" | "confirmed" | "pending" | "cancelled">("all")
