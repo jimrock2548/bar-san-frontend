@@ -1,16 +1,17 @@
 "use client"
-import type React from "react"
-import { useState } from "react"
+import React, { useState } from "react"
 import { useRouter } from "next/navigation"
-import { authenticateAdmin } from "@/app/lib/mockData"
 import axios from "axios"
 
 export default function Page() {
   const [isGoogleLoading, setIsGoogleLoading] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+
+  // Login states
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
 
+  // Register states
   const [name, setName] = useState("")
   const [phone, setPhone] = useState("")
   const [regisEmail, setRegisEmail] = useState("")
@@ -19,7 +20,7 @@ export default function Page() {
 
   const router = useRouter()
 
-  const handleGoogleLogin = () => {
+ /* const handleGoogleLogin = () => {
     setIsGoogleLoading(true)
 
     setTimeout(() => {
@@ -36,87 +37,51 @@ export default function Page() {
       setIsGoogleLoading(false)
       router.push("../")
     }, 2000)
-  }
-    const handleAdminLogin = async (e: React.FormEvent) => {
-      e.preventDefault();
-      setIsLoading(true);
+  }*/
 
-      try {
-        const response = await axios.post('http://myhostserver.sytes.net:5050/auth/login', {
-          email: email,
-          password: password,
-        });
-
-        if (response.data.token) {
-          localStorage.setItem('adminUser', JSON.stringify(response.data));
-          setIsLoading(false);
-          router.push('/admin/dashboard');
-        } else {
-          setIsLoading(false);
-          // Handle error
-        }
-      } catch (error) {
-        setIsLoading(false);
-        // Handle error
-      }
-  };
-  const handleLogin = (e: React.FormEvent) => {
+  const handleAdminLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
 
-    // Check if it's an admin login first
-    const adminAccount = authenticateAdmin(email, password)
-
-    if (adminAccount) {
-      // Admin login successful
-      localStorage.setItem(
-        "adminUser",
-        JSON.stringify({
-          id: adminAccount.id,
-          name: adminAccount.name,
-          email: adminAccount.email,
-          role: adminAccount.role,
-          cafes: adminAccount.cafes.map((cafeName) => ({
-            id: cafeName === "BarSan" ? "cafe-1" : "cafe-2",
-            name: cafeName,
-            displayName: cafeName === "BarSan" ? "BarSan." : "NOIR",
-          })),
-          isLoggedIn: true,
-        }),
+    try {
+      const response = await axios.post(
+        "http://myhostserver.sytes.net:5050/auth/login",
+        {
+          email,
+          password,
+        }
       )
+
+      if (response.data.token) {
+        localStorage.setItem("adminUser", JSON.stringify(response.data))
+        setIsLoading(false)
+        router.push("/admin/dashboard")
+      } else {
+        setIsLoading(false)
+        alert("Login failed: no token received")
+      }
+    } catch (error: any) {
       setIsLoading(false)
-      router.push("/admin/dashboard")
+      alert(`Login failed: ${error.response?.data?.msg || error.message}`)
+    }
+  }
+
+  /*const handleRegister = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (regisPassword !== regisConfirmPassword) {
+      alert("Password and confirm password do not match")
       return
     }
 
-    // Regular user login (existing logic)
-    console.log("Logging in with", email, password)
-    setTimeout(() => {
-      localStorage.setItem(
-        "users",
-        JSON.stringify({
-          id: "2",
-          name: "TestNameEmail",
-          email: email,
-          phone: "987654321",
-          isLoggedIn: true,
-        }),
-      )
-      setIsLoading(false)
-      router.push("../")
-    }, 2000)
-  }
-
-  const handleRegister = (e: React.FormEvent) => {
-    e.preventDefault()
+    // ตัวอย่าง mock register เก็บข้อมูลลง localStorage
     localStorage.setItem(
-      " users",
+      "users",
       JSON.stringify({
         id: "3",
         name,
-        email,
+        email: regisEmail,
         phone,
-        isLoggedin: true,
+        isLoggedIn: true,
       }),
     )
     router.push("../")
@@ -134,7 +99,7 @@ export default function Page() {
       }),
     )
     router.push("../")
-  }
+  }*/
 
   return (
     <main className="flex-1 py-16 container mx-auto px-4">
@@ -148,7 +113,7 @@ export default function Page() {
           <button
             type="button"
             disabled={isGoogleLoading}
-            onClick={handleGoogleLogin}
+            //onClick={handleGoogleLogin}
             className="w-full h-11 flex items-center justify-center gap-2 mb-3 border-b-gray-400 hover:bg-gray-50"
           >
             {isGoogleLoading ? (
@@ -190,7 +155,6 @@ export default function Page() {
             <hr className="flex-grow border-t border-gray-300" />
           </div>
 
-          {/* name of each tab group should be unique */}
           <div className="tabs tabs-box">
             <input type="radio" name="my_tabs_1" className="tab w-1/2" aria-label="Login" defaultChecked />
             <div className="tab-content">
@@ -198,7 +162,7 @@ export default function Page() {
                 <fieldset className="fieldset">
                   <legend className="fieldset-legend">Email</legend>
                   <input
-                    type="input"
+                    type="text"
                     className="input w-full"
                     placeholder="example@example.com"
                     value={email}
@@ -218,14 +182,15 @@ export default function Page() {
                   />
                 </fieldset>
                 <div className="my-6" />
-                <button className="btn btn-neutral w-full" type="submit">
-                  Login
+                <button className="btn btn-neutral w-full" type="submit" disabled={isLoading}>
+                  {isLoading ? "Logging in..." : "Login"}
                 </button>
               </form>
             </div>
+
             <input type="radio" name="my_tabs_1" className="tab w-1/2" aria-label="Register" />
             <div className="tab-content">
-              <form onSubmit={handleRegister}>
+              <form /*onSubmit={handleRegister}*/>
                 <fieldset className="fieldset">
                   <legend className="fieldset-legend">Name</legend>
                   <input
@@ -264,7 +229,7 @@ export default function Page() {
                   <input
                     type="password"
                     className="input w-full"
-                    placeholder="password"
+                    placeholder="Password"
                     value={regisPassword}
                     onChange={(e) => setRegisPassword(e.target.value)}
                     required
@@ -292,7 +257,7 @@ export default function Page() {
 
         <div className="text-center">
           <p className="mb-4 text-[#8a7356]">หรือ</p>
-          <button className="w-full btn btn-outline" onClick={handleGuestContinue}>
+          <button className="w-full btn btn-outline" /*onClick={handleGuestContinue}*/>
             ดำเนินการต่อในฐานะผู้ใช้ทั่วไป
           </button>
         </div>

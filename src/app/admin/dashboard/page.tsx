@@ -1,53 +1,58 @@
 "use client"
 
-import type React from "react"
-import withAuth from "@/app/lib/withauth"
-
+import { useEffect, useState } from "react"
 import { format } from "date-fns"
 import { th } from "date-fns/locale"
 import { CalendarRange, Table2, Users, CalendarDays } from "lucide-react"
-import { useState } from "react"
-import Status from "@/app/components/status"
 import { DayPicker } from "react-day-picker"
 import ReservationDetailModal from "@/app/components/reservationDetail"
 import { useAdmin } from "@/app/admin/layout"
-import {
-  mockCafes,
-  getReservationsByBar,
-  getTablesByBar,
-  getTodayReservationsCount,
-  getPendingReservationsCount,
-  getAvailableTablesCount,
-  getAvailableTablesByZone,
-} from "@/app/lib/mockData"
+import Status from "@/app/components/status"
+import axios from "axios"
 
-
-export default function withAuth(Page) {
-  const { selectedCafe } = useAdmin()
+export default function DashboardPage() {
+  const {selectedCafe } = useAdmin()
   const [date, setDate] = useState<Date>()
   const [zoneFilter, setZoneFilter] = useState<string>("")
   const [statusFilter, setStatusFilter] = useState<string>("All")
   const [viewingReservation, setViewingReservation] = useState<string | null>(null)
   const [selectedTable, setSelectedTable] = useState<{ [key: string]: string }>({})
+  const [dashboardData, setDashboardData] = useState<any>(null)
+  const [reservations, setReservations] = useState<any[]>([])
 
-  const currentCafeName = mockCafes.find((c) => c.id === selectedCafe)?.displayName || ""
+  useEffect(() => {
+  if (!selectedCafe) return
 
-  // Get data for selected cafe
-  const cafeReservations = getReservationsByBar(currentCafeName === "BarSan." ? "BarSan" : "NOIR")
-  const cafeTables = getTablesByBar(currentCafeName === "BarSan." ? "BarSan" : "NOIR")
+  const fetchDashboardData = async () => {
+    try {
+      const token = localStorage.getItem("token") // หรือดึงจาก context ถ้าเก็บไว้ที่อื่น
 
-  const dashboardData = {
-    todayReservations: getTodayReservationsCount(currentCafeName === "BarSan." ? "BarSan" : "NOIR"),
-    reservationChange: selectedCafe === "cafe-1" ? "+15%" : "-10%",
-    pendingReservations: getPendingReservationsCount(currentCafeName === "BarSan." ? "BarSan" : "NOIR"),
-    availableTables: getAvailableTablesCount(currentCafeName === "BarSan." ? "BarSan" : "NOIR"),
+      const res = await axios.get(
+        `http://myhostserver.sytes.net:5050/admin/dashboard/${selectedCafe}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      )
+
+      setDashboardData(res.data.stats)
+      setReservations(res.data.recentReservations)
+    } catch (err: any) {
+  console.error("Error fetching dashboard data", err)
+  if (err.response) {
+    console.error("Response data:", err.response.data)
+  }
+}
   }
 
-  const filteredReservations = cafeReservations.filter((r) => {
+  fetchDashboardData()
+}, [selectedCafe])
+
+  const filteredReservations = reservations.filter((r) => {
     const matchesDate = !date || r.date === format(date, "yyyy-MM-dd")
-    const matchesZone = !zoneFilter || r.zone === zoneFilter
     const matchesStatus = statusFilter === "All" || r.status === statusFilter
-    return matchesDate && matchesZone && matchesStatus
+    return matchesDate && matchesStatus
   })
 
   const handleOpenDetailModal = (id: string) => {
@@ -57,8 +62,9 @@ export default function withAuth(Page) {
   const handleSelectTable = (bookingId: string, tableId: string) => {
     setSelectedTable((prev) => ({ ...prev, [bookingId]: tableId }))
   }
+  console.log(localStorage.getItem("token"))
 
-  const zones = [...new Set(cafeTables.map((table) => table.zone))]
+  if (!dashboardData) return <div className="p-8">Loading...</div>
 
   return (
     <div className="p-4 md:p-6 lg:p-8">
@@ -66,7 +72,7 @@ export default function withAuth(Page) {
         <div>
           <h1 className="text-3xl font-semibold">Dashboard</h1>
           <p className="text-base text-gray-500">
-            Overview of {currentCafeName} - {format(new Date(), "d MMMM yyyy", { locale: th })}
+            Overview - {format(new Date(), "d MMMM yyyy", { locale: th })}
           </p>
         </div>
       </div>
@@ -79,7 +85,7 @@ export default function withAuth(Page) {
               <CalendarRange className="h-4 w-4 text-gray-400" />
             </div>
             <div className="text-2xl font-bold">{dashboardData.todayReservations}</div>
-            <p className="text-xs text-green-500">{dashboardData.reservationChange} จากเมื่อวาน</p>
+            <p className="text-xs text-green-500">จำนวนการจองวันนี้</p>
           </div>
         </div>
 
@@ -101,7 +107,7 @@ export default function withAuth(Page) {
               <Table2 className="h-4 w-4 text-gray-400" />
             </div>
             <div className="text-2xl font-bold">{dashboardData.availableTables}</div>
-            <p className="text-xs text-gray-500">From {cafeTables.length} tables</p>
+            <p className="text-xs text-gray-500">จาก {dashboardData.totalTables} โต๊ะ</p>
           </div>
         </div>
       </div>
@@ -130,65 +136,35 @@ export default function withAuth(Page) {
           </div>
         </div>
 
-        <select className="select select-bordered" value={zoneFilter} onChange={(e) => setZoneFilter(e.target.value)}>
-          <option value="">All Zones</option>
-          {zones.map((zone) => (
-            <option key={zone} value={zone}>
-              {zone}
-            </option>
-          ))}
-        </select>
-
         <select
           className="select select-bordered"
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
         >
           <option value="All">All</option>
-          <option value="confirmed">Table confirmed</option>
-          <option value="pending">No table reserved yet</option>
-          <option value="cancelled">Cancelled</option>
+          <option value="confirmed">Confirmed</option>
+          <option value="pending">Pending</option>
+          <option value="seated">Seated</option>
         </select>
       </div>
 
       <div className="card bg-base-100 shadow mt-6">
         <div className="card-body">
           <h2 className="card-title">Reservation</h2>
-          <div className="grid grid-cols-7 text-sm text-gray-400 mb-2">
+          <div className="grid grid-cols-6 text-sm text-gray-400 mb-2">
             <div>Name</div>
             <div>Date</div>
             <div>Time</div>
-            <div>Zone</div>
-            <div>Table</div>
+            <div>Guests</div>
             <div>Status</div>
             <div></div>
           </div>
           {filteredReservations.map((booking) => (
-            <div key={booking.id} className="grid grid-cols-7 items-center text-sm py-2 border-b border-b-gray-300">
-              <div>{booking.customerName}</div>
+            <div key={booking.id} className="grid grid-cols-6 items-center text-sm py-2 border-b border-b-gray-300">
+              <div>{booking.guest_name}</div>
               <div>{booking.date}</div>
               <div>{booking.time}</div>
-              <div>{booking.zone}</div>
-              <div>
-                <select
-                  className="select select-bordered select-sm w-35"
-                  value={selectedTable[booking.id] || booking.table || ""}
-                  onChange={(e) => handleSelectTable(booking.id, e.target.value)}
-                >
-                  <option value="">เลือกโต๊ะ</option>
-                  {getAvailableTablesByZone(currentCafeName === "BarSan." ? "BarSan" : "NOIR", booking.zone).map(
-                    (table) => (
-                      <option
-                        key={table.id}
-                        value={`${table.zone} - โต๊ะ ${table.number}`}
-                        disabled={table.status === "booked" || !table.isActive}
-                      >
-                        {table.zone} - โต๊ะ {table.number}
-                      </option>
-                    ),
-                  )}
-                </select>
-              </div>
+              <div>{booking.guests}</div>
               <div>
                 <Status statusString={booking.status} />
               </div>
@@ -207,18 +183,7 @@ export default function withAuth(Page) {
 
       {viewingReservation && (
         <ReservationDetailModal
-          reservation={{
-            id: viewingReservation,
-            bar: filteredReservations.find((r) => r.id === viewingReservation)?.bar || "",
-            reservationNumber: filteredReservations.find((r) => r.id === viewingReservation)?.reservationNumber || "",
-            date: filteredReservations.find((r) => r.id === viewingReservation)?.date || "",
-            time: filteredReservations.find((r) => r.id === viewingReservation)?.time || "",
-            guests: filteredReservations.find((r) => r.id === viewingReservation)?.guests || 2,
-            zone: filteredReservations.find((r) => r.id === viewingReservation)?.zone || "",
-            name: filteredReservations.find((r) => r.id === viewingReservation)?.customerName || "",
-            email: filteredReservations.find((r) => r.id === viewingReservation)?.email || "",
-            phone: filteredReservations.find((r) => r.id === viewingReservation)?.phone || "",
-          }}
+          reservation={filteredReservations.find((r) => r.id === viewingReservation)}
           onClose={() => setViewingReservation(null)}
         />
       )}

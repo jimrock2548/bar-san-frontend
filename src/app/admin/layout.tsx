@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import type { ReactNode } from "react"
-import { useRouter } from "next/navigation"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { useEffect, useState, createContext, useContext } from "react"
+import type { ReactNode } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useEffect, useState, createContext, useContext } from "react";
 import {
   CalendarRange,
   ChevronDown,
@@ -15,64 +15,74 @@ import {
   UserCog,
   UserRoundSearch,
   LogInIcon as Logs,
-} from "lucide-react"
+} from "lucide-react";
 
-import { cn } from "@/app/lib/utils"
-import { NotificationPanel } from "@/app/components/nortification-panel"
+import { cn } from "@/app/lib/utils";
+import { NotificationPanel } from "@/app/components/nortification-panel";
 
 interface AdminLayoutProps {
-  children: ReactNode
+  children: ReactNode;
 }
 
 interface AdminContextType {
-  user: any
-  selectedCafe: string
-  setSelectedCafe: (cafeName: string) => void
+  user: any;
+  selectedCafe: string;
+  setSelectedCafe: (cafeName: string) => void;
 }
 
-const AdminContext = createContext<AdminContextType | null>(null)
+const AdminContext = createContext<AdminContextType | null>(null);
 
 export const useAdmin = () => {
-  const context = useContext(AdminContext)
+  const context = useContext(AdminContext);
   if (!context) {
-    throw new Error("useAdmin must be used within AdminLayout")
+    throw new Error("useAdmin must be used within AdminLayout");
   }
-  return context
-}
+  return context;
+};
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
-  const pathname = usePathname()
-  const router = useRouter()
-  const [user, setUser] = useState<any>(null)
-  const [selectedCafe, setSelectedCafe] = useState<string>("")
+  const pathname = usePathname();
+  const router = useRouter();
+  const [user, setUser] = useState<any>(null);
+  const [selectedCafe, setSelectedCafe] = useState<string>("");
+
+  const getCafeName = (cafeID: string): string => {
+    return (
+      user?.roles.find((r: any) => r.cafeID === cafeID)?.cafe || "Admin Panel"
+    );
+  };
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("adminUser")
+    const storedUser = localStorage.getItem("adminUser");
     if (storedUser) {
       try {
-        const userData = JSON.parse(storedUser)
-        setUser(userData.admin)
-        setSelectedCafe(userData.admin.roles[0]?.cafe || "")
+        const userData = JSON.parse(storedUser);
+        setUser(userData.admin);
+        setSelectedCafe(userData.admin.roles[0]?.cafeID || "");
       } catch (err) {
-        console.error("Error parsing admin user data:", err)
-        router.push("/login")
+        console.error("Error parsing admin user data:", err);
+        router.push("/login");
       }
     } else {
-      router.push("/login")
+      router.push("/login");
     }
-  }, [router])
+  }, [router]);
 
   const handleLogout = () => {
-    localStorage.removeItem("adminUser")
-    router.push("/login")
-  }
+    localStorage.removeItem("adminUser");
+    router.push("/login");
+  };
 
   const handleCafeChange = (cafeName: string) => {
-    setSelectedCafe(cafeName)
-  }
+    setSelectedCafe(cafeName);
+  };
 
   if (!user) {
-    return <div className="flex justify-center items-center h-screen">Loading...</div>
+    return (
+      <div className="flex justify-center items-center h-screen">
+        Loading...
+      </div>
+    );
   }
 
   const navigation = [
@@ -82,7 +92,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     { name: "Member", href: "/admin/member", icon: UserRoundSearch },
     { name: "Role", href: "/admin/role", icon: UserCog },
     { name: "Log", href: "/admin/log", icon: Logs },
-  ]
+  ];
 
   return (
     <AdminContext.Provider value={{ user, selectedCafe, setSelectedCafe }}>
@@ -104,7 +114,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                     "flex items-center gap-3 px-4 py-3 rounded-md transition-colors",
                     pathname === item.href
                       ? "bg-gray-800 text-white"
-                      : "text-gray-300 hover:bg-gray-800 hover:text-white",
+                      : "text-gray-300 hover:bg-gray-800 hover:text-white"
                   )}
                 >
                   <item.icon className="h-5 w-5" />
@@ -122,10 +132,10 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 {user?.roles[0]?.role === "super_admin"
                   ? "Super Admin"
                   : user?.roles[0]?.role === "admin"
-                    ? "Admin"
-                    : user?.roles[0]?.role === "staff"
-                      ? "Staff"
-                      : "Viewer"}
+                  ? "Admin"
+                  : user?.roles[0]?.role === "staff"
+                  ? "Staff"
+                  : "Viewer"}
               </p>
             </div>
             <button
@@ -142,22 +152,25 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         <div className="flex-1 bg-gray-100">
           <header className="bg-white border-b sticky top-0 z-10">
             <div className="px-6 py-4 flex justify-between items-center">
-              <h1 className="text-xl font-bold">
-                {selectedCafe || "Admin Panel"}
-              </h1>
+              <h1 className="text-xl font-bold">{getCafeName(selectedCafe)}</h1>
 
               <div className="flex items-center gap-4">
                 {user?.roles.length > 1 && (
                   <div className="dropdown dropdown-end">
                     <label tabIndex={0} className="btn btn-outline gap-2">
-                      {selectedCafe || "Select Cafe"}
+                      {getCafeName(selectedCafe)}
                       <ChevronDown className="h-4 w-4" />
                     </label>
-                    <ul tabIndex={0} className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
+                    <ul
+                      tabIndex={0}
+                      className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52"
+                    >
                       <li className="menu-title">เลือกร้าน</li>
                       {user.roles.map((role: any, index: number) => (
                         <li key={index}>
-                          <a onClick={() => handleCafeChange(role.cafe)}>{role.cafe}</a>
+                          <a onClick={() => handleCafeChange(role.cafeID)}>
+                            {role.cafe}
+                          </a>
                         </li>
                       ))}
                     </ul>
@@ -169,9 +182,14 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
                 {/* User Dropdown */}
                 <div className="dropdown dropdown-end">
-                  <label tabIndex={0} className="btn btn-ghost flex items-center gap-2">
+                  <label
+                    tabIndex={0}
+                    className="btn btn-ghost flex items-center gap-2"
+                  >
                     <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
-                      <span className="font-medium text-sm">{user?.username?.charAt(0)}</span>
+                      <span className="font-medium text-sm">
+                        {user?.username?.charAt(0)}
+                      </span>
                     </div>
                     {user?.username}
                     <ChevronDown className="h-4 w-4" />
@@ -201,5 +219,5 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         </div>
       </div>
     </AdminContext.Provider>
-  )
+  );
 }
