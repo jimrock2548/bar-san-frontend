@@ -66,7 +66,6 @@ useEffect(() => {
   const handleSelectTable = (bookingId: string, tableId: string) => {
     setSelectedTable((prev) => ({ ...prev, [bookingId]: tableId }))
   }
-  console.log(localStorage.getItem("token"))
 
   if (!dashboardData) return <div className="p-8">Loading...</div>
 

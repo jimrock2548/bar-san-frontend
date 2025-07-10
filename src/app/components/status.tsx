@@ -4,40 +4,43 @@ interface StatusProps {
 }
 
 function Status({ statusString }: StatusProps) {
-  let colorClass = ''
-  let textClass = 'text-white' // Default text color
+  const lowerStatus = statusString?.toLowerCase?.() || ""
 
-  switch (statusString.toLowerCase()) {
-    case 'confirmed':
-      colorClass = 'badge-success'
+  let colorClass = ""
+  let textClass = "text-white"
+
+  switch (lowerStatus) {
+    case "confirmed":
+      colorClass = "badge-success"
       break
-    case 'inactive':
-      colorClass = 'badge-neutral'
+    case "inactive":
+      colorClass = "badge-neutral"
       break
-    case 'pending':
-      colorClass = 'badge-warning'
+    case "pending":
+      colorClass = "badge-warning"
       break
-    case 'error':
-      colorClass = 'badge-error'
+    case "error":
+      colorClass = "badge-error"
       break
-    case 'noir':
-      colorClass = 'bg-black' // Black background
-      textClass = 'text-white' // White text
+    case "noir":
+      colorClass = "bg-black"
+      textClass = "text-white"
       break
-    case 'barsan':
-      colorClass = 'bg-white border border-gray-300' // White background with border
-      textClass = 'text-black' // Black text
+    case "barsan":
+      colorClass = "bg-white border border-gray-300"
+      textClass = "text-black"
       break
     default:
-      colorClass = 'badge-info'
+      colorClass = "badge-info"
       break
   }
 
   return (
     <span className={`badge ${colorClass} ${textClass} capitalize`}>
-      {statusString}
+      {statusString || "Unknown"}
     </span>
   )
 }
+
 
 export default Status
