@@ -49,17 +49,20 @@ export default function Page() {
         {
           email,
           password,
-        }
+        },
+        { withCredentials: true }
       )
 
-      if (response.data.token) {
-        localStorage.setItem("adminUser", JSON.stringify(response.data))
-        setIsLoading(false)
-        router.push("/admin/dashboard")
-      } else {
-        setIsLoading(false)
-        alert("Login failed: no token received")
-      }
+      // if (response.data.token) {
+      //   localStorage.setItem("adminUser", JSON.stringify(response.data))
+      //   setIsLoading(false)
+      //   router.push("/admin/dashboard")
+      // } else {
+      //   setIsLoading(false)
+      //   alert("Login failed: no token received")
+      localStorage.setItem("adminUser", JSON.stringify(response.data))
+      setIsLoading(false)
+      router.push("/admin/dashboard")
     } catch (error: any) {
       setIsLoading(false)
       alert(`Login failed: ${error.response?.data?.msg || error.message}`)

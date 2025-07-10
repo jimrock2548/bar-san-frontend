@@ -20,30 +20,34 @@ export default function DashboardPage() {
   const [dashboardData, setDashboardData] = useState<any>(null)
   const [reservations, setReservations] = useState<any[]>([])
 
-  useEffect(() => {
+useEffect(() => {
   if (!selectedCafe) return
 
   const fetchDashboardData = async () => {
     try {
-      const token = localStorage.getItem("token") // หรือดึงจาก context ถ้าเก็บไว้ที่อื่น
+      // เปลี่ยนมาใช้ cookie เลย comment ไว้
+      // const token = localStorage.getItem("token") // หรือดึงจาก context ถ้าเก็บไว้ที่อื่น
 
       const res = await axios.get(
         `http://myhostserver.sytes.net:5050/admin/dashboard/${selectedCafe}`,
         {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
+          // เปลี่ยนมาใช้ cookie เลย comment ไว้
+          // headers: {
+          //   Authorization: Bearer ${token}
+          // }
+          // เพื่อให้แน่ใจว่า axios จะส่ง cookie ไปด้วยเสมอ (โดยเฉพาะในตอนพัฒนาที่ client กับ server อาจจะอยู่คนละ port กัน) 
+          withCredentials: true
         }
       )
 
       setDashboardData(res.data.stats)
       setReservations(res.data.recentReservations)
     } catch (err: any) {
-  console.error("Error fetching dashboard data", err)
-  if (err.response) {
-    console.error("Response data:", err.response.data)
-  }
-}
+      console.error("Error fetching dashboard data", err)
+      if (err.response) {
+        console.error("Response data:", err.response.data)
+      }
+    }
   }
 
   fetchDashboardData()
