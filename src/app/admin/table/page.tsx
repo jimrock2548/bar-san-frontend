@@ -1,26 +1,57 @@
 "use client"
 
 import withAuth from "@/app/lib/withauth"
-
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Edit, Plus } from "lucide-react"
 import { useAdmin } from "@/app/admin/layout"
-import { mockCafes, getTablesByBar, type Table } from "@/app/lib/mockData"
+import axios from "axios"
 
-export default function withAuth(AdminTablesPage) {
+interface Table {
+  id: string
+  number: number
+  seats: number
+  location: string
+  zone: string
+  status: string
+  isActive: boolean
+  bar: string
+}
+
+function AdminTablesPage() {
   const { selectedCafe } = useAdmin()
   const [tables, setTables] = useState<Table[]>([])
   const [editingTable, setEditingTable] = useState<any>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
 
-  const currentCafeName = mockCafes.find((c) => c.id === selectedCafe)?.name || "BarSan"
-  const cafeDisplayName = mockCafes.find((c) => c.id === selectedCafe)?.displayName || currentCafeName
-
-  // Get tables for selected cafe
-  const cafeTables = getTablesByBar(currentCafeName)
+  useEffect(() => {
+    if (selectedCafe) {
+      axios.get(
+        `http://myhostserver.sytes.net:5050/admin/tables/${selectedCafe}`,
+        {
+          withCredentials: true
+        }
+      )
+        .then(res => {
+          const fetchedTables = res.data.tables.map((t: any) => ({
+            id: t.id,
+            number: t.number,
+            seats: t.seats,
+            location: t.location,
+            zone: t.zone.name,
+            status: t.status,
+            isActive: t.is_active,
+            bar: t.cafe
+          }))
+          setTables(fetchedTables)
+        })
+        .catch(err => {
+          console.error("Failed to fetch tables", err)
+        })
+    }
+  }, [selectedCafe])
 
   const handleAddTable = () => {
-    const existingNumbers = cafeTables.map((t) => t.number)
+    const existingNumbers = tables.map((t) => t.number)
     const nextNumber = Math.max(...existingNumbers, 0) + 1
 
     setEditingTable({
@@ -31,7 +62,7 @@ export default function withAuth(AdminTablesPage) {
       zone: "Zone A",
       status: "available",
       isActive: true,
-      bar: currentCafeName,
+      bar: tables[0]?.bar ?? "BarSan",
     })
     setIsDialogOpen(true)
   }
@@ -43,11 +74,9 @@ export default function withAuth(AdminTablesPage) {
 
   const handleSaveTable = () => {
     if (editingTable.id) {
-      // Update existing table
       setTables(tables.map((t) => (t.id === editingTable.id ? editingTable : t)))
     } else {
-      // Add new table
-      const newId = `${currentCafeName.toLowerCase().substring(0, 2)}-t${Date.now()}`
+      const newId = `tbl-${Date.now()}`
       setTables([...tables, { ...editingTable, id: newId }])
     }
     setIsDialogOpen(false)
@@ -64,7 +93,8 @@ export default function withAuth(AdminTablesPage) {
     }
   }
 
-  const zones = [...new Set(cafeTables.map((table) => table.zone))]
+  const cafeDisplayName = tables[0]?.bar || "Selected Cafe"
+  const zones = [...new Set(tables.map((table) => table.zone))]
   const locations = ["ริมหน้าต่าง", "กลางร้าน", "มุมร้าน", "โซนส่วนตัว", "Bar Counter", "Couple Table", "Large Group"]
 
   return (
@@ -74,39 +104,37 @@ export default function withAuth(AdminTablesPage) {
           <h1 className="text-3xl font-bold">Manage Tables</h1>
           <p className="text-gray-500">Manage tables for {cafeDisplayName}</p>
         </div>
-        <div className="flex gap-4">
-          <button className="btn btn-neutral" onClick={handleAddTable}>
-            <Plus className="w-4 h-4 mr-2" />
-            Add Table
-          </button>
-        </div>
+        <button className="btn btn-neutral" onClick={handleAddTable}>
+          <Plus className="w-4 h-4 mr-2" />
+          Add Table
+        </button>
       </div>
 
       {/* Statistics */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <div className="stat bg-base-100 shadow rounded-lg">
           <div className="stat-title">Total Tables</div>
-          <div className="stat-value text-primary">{cafeTables.length}</div>
+          <div className="stat-value text-primary">{tables.length}</div>
         </div>
         <div className="stat bg-base-100 shadow rounded-lg">
           <div className="stat-title">Available</div>
           <div className="stat-value text-success">
-            {cafeTables.filter((t) => t.status === "available" && t.isActive).length}
+            {tables.filter((t) => t.status === "available" && t.isActive).length}
           </div>
         </div>
         <div className="stat bg-base-100 shadow rounded-lg">
           <div className="stat-title">Booked</div>
-          <div className="stat-value text-warning">{cafeTables.filter((t) => t.status === "booked").length}</div>
+          <div className="stat-value text-warning">{tables.filter((t) => t.status === "booked").length}</div>
         </div>
         <div className="stat bg-base-100 shadow rounded-lg">
           <div className="stat-title">Inactive</div>
-          <div className="stat-value text-error">{cafeTables.filter((t) => !t.isActive).length}</div>
+          <div className="stat-value text-error">{tables.filter((t) => !t.isActive).length}</div>
         </div>
       </div>
 
       {/* Tables Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {cafeTables.map((table) => (
+        {tables.map((table) => (
           <div key={table.id} className={`card bg-base-100 shadow ${!table.isActive && "opacity-60"}`}>
             <div className="card-body">
               <div className="flex justify-between items-start">
@@ -142,13 +170,12 @@ export default function withAuth(AdminTablesPage) {
                 <div>
                   <p className="text-sm text-gray-500">Status</p>
                   <span
-                    className={`badge ${
-                      table.status === "available"
-                        ? "badge-success"
-                        : table.status === "booked"
-                          ? "badge-warning"
-                          : "badge-error"
-                    }`}
+                    className={`badge ${table.status === "available"
+                      ? "badge-success"
+                      : table.status === "booked"
+                        ? "badge-warning"
+                        : "badge-error"
+                      }`}
                   >
                     {table.status === "available" ? "Available" : table.status === "booked" ? "Booked" : "Maintenance"}
                   </span>
@@ -280,3 +307,4 @@ export default function withAuth(AdminTablesPage) {
     </div>
   )
 }
+export default AdminTablesPage

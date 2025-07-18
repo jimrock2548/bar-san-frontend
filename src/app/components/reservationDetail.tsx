@@ -3,20 +3,20 @@
 import { X } from "lucide-react"
 import { format } from "date-fns"
 import { th } from "date-fns/locale"
-import Status from "./status"
+import StoreBadge from "./storeBadge"
 
 interface ReservationDetailModalProps {
   reservation: {
     id: string
-    bar: string
-    reservationNumber: string
+    cafe: string
+    reservation_number: string
     date: string
     time: string
     guests: number
     zone: string
-    name: string
-    email: string
-    phone: string
+    guest_name: string
+    guest_email: string
+    guest_phone: string
   }
   onClose: () => void
 }
@@ -35,8 +35,8 @@ export default function ReservationDetailModal({ reservation, onClose }: Reserva
           </div>
           
           <div className="mb-6 flex justify-between">
-            <p className="text-gray-500">Reservation Number: {reservation.reservationNumber}</p>
-            <Status statusString={reservation.bar} />
+            <p className="text-gray-500">Reservation Number: {reservation.reservation_number}</p>
+            <StoreBadge storeName={reservation.cafe} />
           </div>
              <div className="divider"></div>
           <div className="space-y-4 mb-6">
@@ -63,13 +63,13 @@ export default function ReservationDetailModal({ reservation, onClose }: Reserva
           
           <div className="space-y-2">
             <p className="text-gray-500">Booking Name</p>
-            <p className="font-bold">{reservation.name}</p>
+            <p className="font-bold">{reservation.guest_name}</p>
             
             <p className="text-gray-500">Email</p>
-            <p className="font-medium">{reservation.email}</p>
+            <p className="font-medium">{reservation.guest_email}</p>
             
             <p className="text-gray-500">Phone number</p>
-            <p className="font-medium">{reservation.phone}</p>
+            <p className="font-medium">{reservation.guest_phone}</p>
           </div>
           
           <div className="mt-8 flex justify-end">

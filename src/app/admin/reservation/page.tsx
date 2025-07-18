@@ -130,7 +130,7 @@ export default function withAuth(AdminReservationPage) {
               <th>Bar</th>
               <th>Status</th>
               <th>Table</th>
-              <th>Actions</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>

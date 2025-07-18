@@ -11,7 +11,7 @@ import Status from "@/app/components/status"
 import axios from "axios"
 
 export default function DashboardPage() {
-  const {selectedCafe } = useAdmin()
+  const { selectedCafe } = useAdmin()
   const [date, setDate] = useState<Date>()
   const [zoneFilter, setZoneFilter] = useState<string>("")
   const [statusFilter, setStatusFilter] = useState<string>("All")
@@ -20,38 +20,38 @@ export default function DashboardPage() {
   const [dashboardData, setDashboardData] = useState<any>(null)
   const [reservations, setReservations] = useState<any[]>([])
 
-useEffect(() => {
-  if (!selectedCafe) return
+  useEffect(() => {
+    if (!selectedCafe) return
 
-  const fetchDashboardData = async () => {
-    try {
-      // เปลี่ยนมาใช้ cookie เลย comment ไว้
-      // const token = localStorage.getItem("token") // หรือดึงจาก context ถ้าเก็บไว้ที่อื่น
+    const fetchDashboardData = async () => {
+      try {
+        // เปลี่ยนมาใช้ cookie เลย comment ไว้
+        // const token = localStorage.getItem("token") // หรือดึงจาก context ถ้าเก็บไว้ที่อื่น
 
-      const res = await axios.get(
-        `http://myhostserver.sytes.net:5050/admin/dashboard/${selectedCafe}`,
-        {
-          // เปลี่ยนมาใช้ cookie เลย comment ไว้
-          // headers: {
-          //   Authorization: Bearer ${token}
-          // }
-          // เพื่อให้แน่ใจว่า axios จะส่ง cookie ไปด้วยเสมอ (โดยเฉพาะในตอนพัฒนาที่ client กับ server อาจจะอยู่คนละ port กัน) 
-          withCredentials: true
+        const res = await axios.get(
+          `http://myhostserver.sytes.net:5050/admin/dashboard/${selectedCafe}`,
+          {
+            // เปลี่ยนมาใช้ cookie เลย comment ไว้
+            // headers: {
+            //   Authorization: Bearer ${token}
+            // }
+            // เพื่อให้แน่ใจว่า axios จะส่ง cookie ไปด้วยเสมอ (โดยเฉพาะในตอนพัฒนาที่ client กับ server อาจจะอยู่คนละ port กัน) 
+            withCredentials: true
+          }
+        )
+
+        setDashboardData(res.data.stats)
+        setReservations(res.data.recentReservations)
+      } catch (err: any) {
+        console.error("Error fetching dashboard data", err)
+        if (err.response) {
+          console.error("Response data:", err.response.data)
         }
-      )
-
-      setDashboardData(res.data.stats)
-      setReservations(res.data.recentReservations)
-    } catch (err: any) {
-      console.error("Error fetching dashboard data", err)
-      if (err.response) {
-        console.error("Response data:", err.response.data)
       }
     }
-  }
 
-  fetchDashboardData()
-}, [selectedCafe])
+    fetchDashboardData()
+  }, [selectedCafe])
 
   const filteredReservations = reservations.filter((r) => {
     const matchesDate = !date || r.date === format(date, "yyyy-MM-dd")
@@ -63,9 +63,10 @@ useEffect(() => {
     setViewingReservation(id)
   }
 
-  const handleSelectTable = (bookingId: string, tableId: string) => {
-    setSelectedTable((prev) => ({ ...prev, [bookingId]: tableId }))
-  }
+ const handleSelectTable = (bookingId: string, tableNumber: string) => {
+  setSelectedTable((prev) => ({ ...prev, [bookingId]: tableNumber }))
+}
+
 
   if (!dashboardData) return <div className="p-8">Loading...</div>
 
@@ -154,20 +155,38 @@ useEffect(() => {
       <div className="card bg-base-100 shadow mt-6">
         <div className="card-body">
           <h2 className="card-title">Reservation</h2>
-          <div className="grid grid-cols-6 text-sm text-gray-400 mb-2">
+          <div className="grid grid-cols-8 text-sm text-gray-400 mb-2">
             <div>Name</div>
             <div>Date</div>
             <div>Time</div>
             <div>Guests</div>
+            <div>Zone</div>
+            <div>Table</div>
             <div>Status</div>
             <div></div>
           </div>
           {filteredReservations.map((booking) => (
-            <div key={booking.id} className="grid grid-cols-6 items-center text-sm py-2 border-b border-b-gray-300">
+            <div key={booking.id} className="grid grid-cols-8 items-center text-sm py-2 border-b border-b-gray-300">
               <div>{booking.guest_name}</div>
               <div>{booking.date}</div>
               <div>{booking.time}</div>
               <div>{booking.guests}</div>
+              <div>{booking.zone}</div>
+              <div>
+                <select
+                  className="select select-bordered select-xs"
+                  value={selectedTable[booking.id] || booking.table}
+                  onChange={(e) => handleSelectTable(booking.id, e.target.value)}
+                >
+                  <option value="">Select table</option>
+                  {dashboardData.tables?.map((table: any) => (
+                    <option key={table.id} value={table.number}>
+                      {table.number} ({table.zone})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
               <div>
                 <Status statusString={booking.status} />
               </div>
